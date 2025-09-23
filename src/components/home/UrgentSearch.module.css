@@ -1,0 +1,159 @@
+.urgentSearchSection {
+    width: 100%;
+}
+
+.sectionTitle {
+    font-size: 36px;
+    font-weight: 800;
+    text-align: left;
+    margin-bottom: 40px;
+    color: var(--light-gray);
+    /* Темный заголовок на светлом фоне родителя */
+}
+
+/* Сетка для карточек */
+.grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 32px;
+}
+
+.card {
+    background-color: var(--deep-blue);
+    border-radius: 16px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.2s ease-in-out;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+.imageContainer {
+    width: 100%;
+    padding-top: 100%;
+    position: relative;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 16px;
+}
+
+.imageContainer img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.infoBar {
+    display: flex;
+    justify-content: space-between;
+    color: var(--cool-gray);
+    margin-bottom: 16px;
+}
+
+.infoItem {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 16px;
+    font-weight: 500;
+}
+
+/* --- Основной текстовый контент --- */
+.cardContent {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+.title {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--light-gray);
+    line-height: 1.4;
+    flex-grow: 1;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+}
+
+.updateInfo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 16px;
+    color: var(--cool-gray);
+    margin: 16px 0;
+}
+
+/* --- Желтая кнопка "Начать поиск" --- */
+.searchButton {
+    background-color: var(--amber-yellow);
+    color: var(--light-gray);
+    border: none;
+    padding: 16px;
+    width: 100%;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 20px;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    margin-top: auto;
+}
+
+.searchButton:hover {
+    background-color: var(--light-yellow);
+}
+
+
+.actions {
+    text-align: center;
+    margin-top: 80px;
+}
+
+.showMoreButton {
+    background-color: var(--deep-blue);
+    color: var(--light-gray);
+    padding: 18px 40px;
+    border-radius: 8px;
+    font-size: 20px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.showMoreButton:hover {
+    background-color: #3e4a5f;
+}
+
+.stateMessage {
+    color: var(--deep-blue);
+    text-align: center;
+    padding: 40px;
+    font-size: 18px;
+}
+
+
+/* Планшеты и ноутбуки */
+@media (max-width: 1700px) {
+    .grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* Мобильные устройства */
+@media (max-width: 768px) {
+    .grid {
+        grid-template-columns: 1fr;
+    }
+
+    .sectionTitle {
+        font-size: 28px;
+    }
+}

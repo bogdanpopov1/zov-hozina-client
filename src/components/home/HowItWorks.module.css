@@ -1,0 +1,65 @@
+.howItWorksSection {
+  width: 100%;
+}
+
+.title {
+  font-size: 36px;
+  font-weight: 800;
+  color: var(--light-gray);
+  text-align: left;
+  margin-bottom: 40px;
+}
+
+.featuresGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 32px;
+}
+
+.featureCard {
+  background-color: var(--dark-slate);
+  border-radius: 20px;
+  padding: 40px;
+  text-align: center;
+  position: relative;
+  padding-top: 80px; /* Место для иконки */
+  margin-top: 80px;
+}
+
+.iconContainer {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 120px;
+  height: 120px;
+}
+
+.iconContainer img {
+  width: 100%;
+  height: 100%;
+}
+
+.featureCard h3 {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--light-gray);
+  margin-bottom: 16px;
+}
+
+.featureCard p {
+  font-size: 18px;
+  color: var(--cool-gray);
+  line-height: 1.6;
+}
+
+/* Адаптация */
+@media (max-width: 992px) {
+  .featuresGrid {
+    grid-template-columns: 1fr;
+    gap: 80px; /* Увеличиваем вертикальный отступ на мобильных */
+  }
+  .title {
+    text-align: center;
+  }
+}

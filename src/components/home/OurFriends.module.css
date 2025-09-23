@@ -1,0 +1,103 @@
+.friendsSection {
+    width: 100%;
+    padding-bottom: 120px;
+    
+}
+
+.title {
+    font-size: 36px;
+    font-weight: 800;
+    color: var(--light-gray);
+    text-align: left;
+    margin-bottom: 40px;
+}
+
+.logosContainer {
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+    -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+    mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+}
+
+.logosSlider {
+    display: flex;
+    width: fit-content;
+    animation: scroll 30s linear infinite;
+}
+
+.logoCard {
+    position: relative;
+    /* Необходимо для псевдоэлемента свечения */
+    flex-shrink: 0;
+    width: 250px;
+    height: 150px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid var(--dark-slate);
+    border-radius: 20px;
+    margin: 0 16px;
+    transition: border-color 0.3s ease;
+    overflow: hidden;
+    /* Чтобы свечение не выходило за пределы карточки */
+}
+
+/* Эффект свечения */
+.logoCard::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    width: 150%;
+    height: 150%;
+    background: radial-gradient(circle, var(--cool-gray) 0%, transparent 70%);
+    opacity: 0;
+    transition: opacity 0.4s ease, transform 0.4s ease;
+    z-index: 1;
+    /* Под логотипом */
+}
+
+.logoCard:hover {
+    border-color: var(--cool-gray);
+}
+
+.logoCard:hover::before {
+    opacity: 0.2;
+    /* Интенсивность свечения */
+    transform: translate(-50%, -50%) scale(1);
+}
+
+.logoCard img {
+    position: relative;
+    /* Чтобы логотип был поверх свечения */
+    z-index: 2;
+    max-width: 70%;
+    /* Немного уменьшил, чтобы свечение было лучше видно */
+    max-height: 70%;
+    transition: transform 0.3s ease;
+    /* Плавное увеличение при наведении */
+}
+
+.logoCard:hover img {
+    transform: scale(1.05);
+    /* Немного увеличиваем лого при наведении */
+}
+
+/* Анимация движения логотипов */
+@keyframes scroll {
+    from {
+        transform: translateX(0);
+    }
+
+    to {
+        transform: translateX(-50%);
+    }
+}
+
+@media (max-width: 992px) {
+    .title {
+        text-align: center;
+    }
+}

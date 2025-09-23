@@ -1,0 +1,178 @@
+.footer {
+  width: 100%;
+  background-color: var(--deep-blue);
+  color: var(--cool-gray);
+  padding: 80px 130px 40px;
+  border-top: 1px solid var(--dark-slate);
+}
+
+/* === ДЕСКТОП === */
+.desktopFooter {
+  display: block;
+}
+
+.mainContent {
+  display: flex;
+  justify-content: space-between;
+  gap: 32px;
+  padding-bottom: 60px;
+  border-bottom: 1px solid var(--dark-slate);
+}
+
+.brandColumn {
+  flex: 2;
+}
+
+.brandColumn .logo {
+  height: 54px;
+  margin-bottom: 24px;
+  display: block;
+}
+
+.brandColumn p {
+  font-size: 18px;
+  font-weight: 500;
+  color: #e3d5a5;
+  line-height: 1.5;
+}
+
+.linksColumn {
+  flex: 1.5;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.linksColumn h4 {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--light-gray);
+  margin-bottom: 8px;
+}
+
+.linksColumn a {
+  color: var(--cool-gray);
+  transition: color 0.2s;
+  font-size: 16px;
+}
+
+.linksColumn a:hover {
+  color: var(--amber-yellow);
+}
+
+.ctaColumn {
+  flex: 1.2;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 24px;
+}
+
+.mapButton {
+  width: 100%;
+  padding: 16px 24px;
+  text-align: center;
+  font-weight: 700;
+  font-size: 16px;
+  color: var(--light-gray);
+  background-color: var(--dark-slate);
+  border-radius: 8px;
+  transition: all 0.2s;
+}
+
+.mapButton:hover {
+  background-color: #3e4a5f;
+}
+
+.telegramLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  color: var(--amber-yellow);
+}
+
+.bottomBar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 14px;
+  padding-top: 32px;
+}
+
+.bottomBar a:hover {
+  text-decoration: underline;
+}
+
+/* === МОБИЛЬНАЯ ВЕРСИЯ === */
+.mobileFooter {
+  display: none;
+}
+
+/* === АДАПТАЦИЯ === */
+@media (max-width: 1200px) {
+  .footer {
+    padding: 60px 40px 30px;
+  }
+}
+
+@media (max-width: 992px) {
+  .footer {
+    padding: 40px 24px 24px;
+  }
+
+  .desktopFooter {
+    display: none;
+  }
+
+  .mobileFooter {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding-bottom: 32px;
+    border-bottom: 1px solid var(--dark-slate);
+  }
+
+  .dropdownToggle {
+    width: 100%;
+    background: none;
+    border: none;
+    color: var(--light-gray);
+    font-size: 18px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    font-family: 'Manrope', sans-serif;
+  }
+
+  .dropdownMenu {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 16px 0 16px 16px;
+  }
+
+  .dropdownMenu a {
+    font-size: 16px;
+  }
+
+  .mobileActions {
+    padding-top: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .mobileActions .mapButton {
+    font-size: 18px;
+  }
+
+  .bottomBar {
+    flex-direction: column;
+    text-align: center;
+    gap: 12px;
+  }
+}
