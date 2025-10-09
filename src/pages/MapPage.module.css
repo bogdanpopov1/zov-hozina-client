@@ -1,0 +1,161 @@
+/* ИСПРАВЛЕНО: Стили полностью переписаны под темную тему и Layout */
+
+.mapPage {
+    display: flex;
+    /* Добавляем отступ сверху, равный высоте хедера */
+    padding-top: 84px; 
+    height: 100vh; /* Занимаем всю высоту видимой области */
+    background-color: var(--deep-blue);
+    color: var(--light-gray);
+}
+
+.leftPanel {
+    width: 400px; /* Фиксированная ширина для левой панели */
+    background: var(--deep-blue);
+    border-right: 1px solid var(--dark-slate);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.rightPanel {
+    flex-grow: 1; /* Занимаем все оставшееся пространство */
+    position: relative;
+}
+
+.panelHeader {
+    padding: 20px;
+    border-bottom: 1px solid var(--dark-slate);
+    background: var(--deep-blue);
+    flex-shrink: 0;
+}
+
+.headerInfo {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+}
+
+.count {
+    font-size: 14px;
+    color: var(--cool-gray);
+    font-weight: 500;
+}
+
+.sortSelect {
+    padding: 6px 12px;
+    border: 1px solid var(--dark-slate);
+    border-radius: 6px;
+    background: var(--dark-slate);
+    font-size: 14px;
+    color: var(--light-gray);
+    cursor: pointer;
+    outline: none;
+    transition: border-color 0.2s ease;
+}
+
+.sortSelect:hover {
+    border-color: var(--cool-gray);
+}
+
+.announcementsList {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding: 8px;
+}
+
+/* Стилизация скроллбара для Webkit-браузеров (Chrome, Safari) */
+.announcementsList::-webkit-scrollbar {
+    width: 6px;
+}
+
+.announcementsList::-webkit-scrollbar-track {
+    background: var(--deep-blue);
+}
+
+.announcementsList::-webkit-scrollbar-thumb {
+    background: var(--dark-slate);
+    border-radius: 3px;
+}
+
+.announcementsList::-webkit-scrollbar-thumb:hover {
+    background: var(--cool-gray);
+}
+
+/* ДОБАВЛЕНО: Стиль для подсветки выбранной карточки */
+.selectedCard {
+    border: 1px solid var(--amber-yellow);
+    box-shadow: 0 0 10px rgba(235, 176, 0, 0.3);
+}
+
+.map {
+    width: 100%;
+    height: 100%;
+}
+
+.loadingContainer,
+.errorContainer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    background: var(--deep-blue);
+}
+
+.loading,
+.error {
+    padding: 20px 40px;
+    background: var(--dark-slate);
+    border-radius: 8px;
+    font-size: 16px;
+    color: var(--light-gray);
+}
+
+.error {
+    color: var(--red);
+}
+
+.emptyState {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    text-align: center;
+    color: var(--cool-gray);
+}
+
+.emptyState p {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 500;
+}
+
+/* Адаптация */
+@media (max-width: 1024px) {
+    .leftPanel {
+        width: 350px;
+    }
+}
+
+@media (max-width: 768px) {
+    .mapPage {
+        flex-direction: column;
+        padding-top: 72px; /* Уменьшаем отступ для мобильного хедера */
+        height: auto; /* Убираем 100vh для мобильных */
+    }
+    
+    .leftPanel {
+        width: 100%;
+        height: 50vh; /* 50% высоты экрана */
+        border-right: none;
+        border-bottom: 1px solid var(--dark-slate);
+    }
+    
+    .rightPanel {
+        width: 100%;
+        height: 50vh; /* 50% высоты экрана */
+    }
+}

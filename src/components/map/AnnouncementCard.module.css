@@ -1,0 +1,129 @@
+.card {
+    background: white;
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 16px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 1px solid #e5e7eb;
+}
+
+.card:hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    transform: translateY(-2px);
+}
+
+.imageContainer {
+    position: relative;
+    width: 100%;
+    height: 200px;
+    margin-bottom: 12px;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.petImage {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+.statusTag {
+    position: absolute;
+    bottom: 8px;
+    left: 8px;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    color: white;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.urgentTag {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+}
+
+.importantTag {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+}
+
+.defaultTag {
+    background: linear-gradient(135deg, #6b7280, #4b5563);
+}
+
+.content {
+    flex: 1;
+}
+
+.title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1f2937;
+    margin: 0 0 8px 0;
+    line-height: 1.4;
+}
+
+.description {
+    font-size: 14px;
+    color: #6b7280;
+    margin: 0 0 12px 0;
+    line-height: 1.5;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.metaInfo {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.metaItem {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: #6b7280;
+}
+
+.icon {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+    color: #9ca3af;
+}
+
+.metaItem span {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .card {
+        padding: 12px;
+    }
+    
+    .imageContainer {
+        height: 160px;
+    }
+    
+    .title {
+        font-size: 15px;
+    }
+    
+    .description {
+        font-size: 13px;
+    }
+    
+    .metaItem {
+        font-size: 12px;
+    }
+}
