@@ -2,9 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import styles from './UrgentSearch.module.css';
 import { MapPin, CheckCircle2, Clock } from 'lucide-react';
+import placeholderImage from '../../assets/stories/cat-illustration.svg';
 
 const UrgentSearchCard = ({ ad }) => {
-    const imageUrl = ad.photos && ad.photos.length > 0 ? ad.photos[0].path : 'src\assets\stories\cat-illustration.svg'; 
+    const imageUrl = ad.photos && ad.photos.length > 0 ? ad.photos[0].path : placeholderImage; 
 
     return (
         <div className={styles.card}>
