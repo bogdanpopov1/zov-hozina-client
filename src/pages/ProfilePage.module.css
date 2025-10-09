@@ -1,0 +1,95 @@
+.profilePage {
+    padding: 120px 20px 60px;
+    background-color: var(--deep-blue);
+    min-height: 100vh;
+}
+
+.container {
+    max-width: 900px;
+    margin: 0 auto;
+    background-color: var(--dark-slate);
+    padding: 40px;
+    border-radius: 16px;
+}
+
+.profilePage h1 {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.profileContent {
+    display: flex;
+    gap: 40px;
+}
+
+.avatarSection {
+    flex: 1;
+    text-align: center;
+}
+
+.avatarSection img {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid var(--amber-yellow);
+    margin-bottom: 20px;
+}
+
+.avatarSection h2 {
+    font-size: 24px;
+    margin-bottom: 8px;
+}
+
+.avatarSection p {
+    color: var(--cool-gray);
+}
+
+.formSection {
+    flex: 2;
+}
+
+.formGroup {
+    margin-bottom: 20px;
+}
+
+.formGroup label {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--cool-gray);
+}
+
+.formGroup input,
+.formGroup textarea {
+    width: 100%;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid var(--cool-gray);
+    background-color: var(--deep-blue);
+    color: var(--light-gray);
+    font-size: 16px;
+}
+
+.submitButton {
+    width: 100%;
+    padding: 14px;
+    border-radius: 8px;
+    border: none;
+    background-color: var(--amber-yellow);
+    color: var(--deep-blue);
+    font-weight: 700;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.message {
+    text-align: center;
+    margin-top: 20px;
+    color: var(--green);
+}
+
+@media (max-width: 768px) {
+    .profileContent {
+        flex-direction: column;
+    }
+}
