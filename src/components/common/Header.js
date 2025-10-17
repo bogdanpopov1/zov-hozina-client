@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Link, NavLink } from 'react-router-dom';
+import { Link, NavLink, useNavigate } from 'react-router-dom';
 import styles from './Header.module.css';
 import logo from '../../assets/logo.svg';
 import { FiSearch } from 'react-icons/fi';
@@ -9,7 +9,7 @@ import { useAuth } from '../../context/AuthContext'; // Импортируем �
 import AuthModal from './AuthModal'; // Импортируем модальное окно
 
 const ownerLinks = [
-    { path: '/create', label: 'Создать объявление' },
+    { path: '/create-announcement', label: 'Создать объявление' },
     { path: '/my-ads', label: 'Мои объявления' },
     { path: '/faq', label: 'Вопросы и ответы' },
     { path: '/tips', label: 'Полезные советы' },
@@ -24,6 +24,8 @@ const volunteerLinks = [
 ];
 
 const Header = () => {
+    const navigate = useNavigate(); 
+
     // === Состояния для меню и поиска ===
     const [isOwnerMenuOpen, setOwnerMenuOpen] = useState(false);
     const [isVolunteerMenuOpen, setVolunteerMenuOpen] = useState(false);
@@ -129,7 +131,7 @@ const Header = () => {
                     ) : (
                         <>
                             <button onClick={handleLoginClick} className={styles.loginButton}>Войти</button>
-                            <button onClick={handleLoginClick} className={styles.ctaButton}>Создать объявление</button>
+                            <button onClick={() => navigate('/create-announcement')} className={styles.ctaButton}>Создать объявление</button>
                         </>
                     )}
                 </div>

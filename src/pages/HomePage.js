@@ -15,8 +15,8 @@ const HomePage = () => {
           <h1>Потерялся друг? Поможем найти</h1>
           <p>Единая платформа поиска пропавших животных</p>
           <div className={styles.buttonGroup}>
-            <Link to="/create" className={styles.ctaButton}>Пропал питомец</Link>
-            <Link to="/map" className={styles.secondaryButton}>Сообщить о находке</Link>
+            <Link to="/create-announcement" className={styles.ctaButton}>Пропал питомец</Link>
+            <Link to="/create-announcement" className={styles.secondaryButton}>Сообщить о находке</Link>
           </div>
         </div>
       </section>

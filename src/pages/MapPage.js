@@ -1,20 +1,19 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { YMaps, Map, Placemark } from 'react-yandex-maps';
 import AnnouncementCard from '../components/map/AnnouncementCard';
+import YandexMap from '../components/map/YandexMap';
 import styles from './MapPage.module.css';
-
-// Выносим ключ в константу для чистоты
-const YANDEX_API_KEY = process.env.REACT_APP_YANDEX_MAPS_API_KEY;
+import useYandexMaps from '../hooks/useYandexMaps';
 
 const MapPage = () => {
-    // ... весь остальной код компонента (хуки, хендлеры) остается без изменений ...
+    const { api: ymapsApi, loading: ymapsLoading, error: ymapsError } = useYandexMaps();
+
     const [announcements, setAnnouncements] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [selectedId, setSelectedId] = useState(null);
     const [mapState, setMapState] = useState({
-        center: [55.796127, 49.106414],
-        zoom: 10,
+        center: [55.796127, 49.106414], // Казань
+        zoom: 12, // Сделаем чуть меньше зум по умолчанию
         controls: ['zoomControl', 'fullscreenControl']
     });
     const listRef = useRef(null);
@@ -26,8 +25,15 @@ const MapPage = () => {
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
-                const data = await response.json();
-                setAnnouncements(Array.isArray(data) ? data : []);
+                const responseData = await response.json();
+
+                // === ГЛАВНОЕ ИСПРАВЛЕНИЕ ===
+                // Этот код универсален. Он проверит, есть ли у ответа структура пагинации (.data).
+                // Если да - возьмет массив из нее. Если нет - возьмет сам ответ.
+                const announcementsArray = responseData.data ? responseData.data : responseData;
+
+                setAnnouncements(Array.isArray(announcementsArray) ? announcementsArray : []);
+
             } catch (err) {
                 console.error("Failed to fetch announcements:", err);
                 setError(err.message);
@@ -37,6 +43,16 @@ const MapPage = () => {
         };
         fetchAnnouncements();
     }, []);
+    
+    useEffect(() => {
+        if (!selectedId || !listRef.current) return;
+
+        const selectedCard = listRef.current.querySelector(`[data-id="${selectedId}"]`);
+        if (selectedCard) {
+            selectedCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    }, [selectedId]);
+
 
     const handleCardClick = (announcement) => {
         setSelectedId(announcement.announcement_id);
@@ -46,84 +62,63 @@ const MapPage = () => {
     };
 
     const handlePlacemarkClick = (announcement) => {
-        setSelectedId(announcement.announcement_id);
-        const cardElement = document.getElementById(`announcement-${announcement.announcement_id}`);
-        if (cardElement && listRef.current) {
-            listRef.current.scrollTo({
-                top: cardElement.offsetTop - listRef.current.offsetTop,
-                behavior: 'smooth'
-            });
+        try {
+            if (announcement && announcement.announcement_id) {
+                setSelectedId(announcement.announcement_id);
+            }
+        } catch (error) {
+            console.error('Error handling placemark click:', error);
         }
     };
 
-    if (loading) {
-        return <div className={styles.loadingContainer}><div className={styles.loading}>Загрузка объявлений...</div></div>;
+
+    if (loading || ymapsLoading) {
+        return <div className={styles.loadingContainer}><div className={styles.loading}>Загрузка данных и карты...</div></div>;
+    }
+    
+    if (error || ymapsError) {
+         return <div className={styles.errorContainer}><div className={styles.error}>Ошибка загрузки: {error || ymapsError.message}</div></div>;
     }
 
     return (
         <div className={styles.mapPage}>
             <div className={styles.leftPanel}>
-                {/* ... левая панель без изменений ... */}
                 <div className={styles.panelHeader}>
+                    <div className={styles.tabs}>
+                        <button className={`${styles.tab} ${styles.active}`}>Объявления</button>
+                        <button className={styles.tab}>Фильтры</button>
+                    </div>
                     <div className={styles.headerInfo}>
                         <span className={styles.count}>Найдено {announcements.length} объявлений</span>
-                        <select className={styles.sortSelect}>
-                            <option value="newest">Сначала новые</option>
-                            <option value="urgent">Сначала срочные</option>
-                        </select>
                     </div>
                 </div>
                 <div className={styles.announcementsList} ref={listRef}>
-                    {error && <div className={styles.errorContainer}><div className={styles.error}>Ошибка загрузки: {error}</div></div>}
-                    {!error && announcements.length > 0 ? (
+                    {announcements.length > 0 ? (
                         announcements.map((announcement) => (
-                            <div 
-                                id={`announcement-${announcement.announcement_id}`} 
-                                key={announcement.announcement_id}
-                                className={selectedId === announcement.announcement_id ? styles.selectedCard : ''}
-                            >
+                            <div key={announcement.announcement_id} data-id={announcement.announcement_id}>
                                 <AnnouncementCard
                                     announcement={announcement}
                                     onClick={() => handleCardClick(announcement)}
+                                    isSelected={selectedId === announcement.announcement_id}
                                 />
                             </div>
                         ))
                     ) : (
-                        !loading && <div className={styles.emptyState}><p>Активных объявлений не найдено</p></div>
+                        <div className={styles.emptyState}>
+                            <p>Активных объявлений не найдено</p>
+                        </div>
                     )}
                 </div>
             </div>
             <div className={styles.rightPanel}>
-                {/* ДОБАВЛЕНА ПРОВЕРКА НАЛИЧИЯ КЛЮЧА */}
-                {YANDEX_API_KEY ? (
-                    <YMaps query={{ apikey: YANDEX_API_KEY }}>
-                        <Map state={mapState} width="100%" height="100%">
-                            {announcements.map((announcement) => {
-                                if (!announcement.latitude || !announcement.longitude) return null;
-                                const isSelected = selectedId === announcement.announcement_id;
-                                return (
-                                    <Placemark
-                                        key={announcement.announcement_id}
-                                        geometry={[parseFloat(announcement.latitude), parseFloat(announcement.longitude)]}
-                                        properties={{
-                                            balloonContentHeader: `${announcement.pet_breed}, ${announcement.pet_name}`,
-                                            balloonContentBody: announcement.description,
-                                        }}
-                                        options={{
-                                            preset: 'islands#circleIcon',
-                                            iconColor: isSelected ? '#EBB000' : (announcement.is_featured ? '#ef4444' : '#3b82f6'),
-                                            zIndex: isSelected ? 1000 : 1,
-                                        }}
-                                        onClick={() => handlePlacemarkClick(announcement)}
-                                    />
-                                );
-                            })}
-                        </Map>
-                    </YMaps>
-                ) : (
-                    <div className={styles.errorContainer}>
-                        <div className={styles.error}>Ключ API Яндекс.Карт не найден. Проверьте файл .env</div>
-                    </div>
+                {ymapsApi && (
+                     <YandexMap
+                        ymaps={ymapsApi}
+                        announcements={announcements}
+                        mapState={mapState}
+                        selectedId={selectedId}
+                        onPlacemarkClick={handlePlacemarkClick}
+                    />
                 )}
             </div>
         </div>

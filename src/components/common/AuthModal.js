@@ -35,7 +35,7 @@ const AuthModal = ({ onClose }) => {
         <div className={styles.overlay} onClick={onClose}>
             <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
                 <button className={styles.closeButton} onClick={onClose}><X size={24} /></button>
-                <h2>{isRegister ? 'Создание аккаунта' : 'Вход в аккаунт'}</h2>
+                <h2>{isRegister ? 'Регистрация' : 'Вход в аккаунт'}</h2>
                 <form onSubmit={handleSubmit}>
                     {isRegister && (
                         <input type="text" placeholder="Ваше имя" value={name} onChange={(e) => setName(e.target.value)} required />

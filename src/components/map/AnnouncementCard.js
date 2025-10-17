@@ -1,23 +1,21 @@
 import React from 'react';
 import { MapPin, Clock, Palette, User } from 'lucide-react';
 import styles from './AnnouncementCard.module.css';
-import placeholderImage from '../../assets/stories/cat-illustration.svg'; // Заглушка
+import placeholderImage from '../../assets/stories/cat-illustration.svg';
 
-const AnnouncementCard = ({ announcement, onClick }) => {
-    // ИСПРАВЛЕНО: Статус берем из поля is_featured, как на главной
+const AnnouncementCard = ({ announcement, onClick, isSelected }) => {
     const getStatusTag = (isFeatured) => {
+        // В будущем можно будет добавить больше статусов
         if (isFeatured) {
             return { text: 'Срочный поиск', className: styles.urgentTag };
         }
+        // Можно добавить 'Важный поиск' и т.д.
         return { text: 'В поиске', className: styles.defaultTag };
     };
 
-    // ИСПРАВЛЕНО: Данные о владельце приходят в поле `user`
     const getOwnerInfo = (user) => {
-        if (!user) {
-            return 'Владелец: Неизвестно';
-        }
-        // В будущем можно будет добавить проверку на тип пользователя (приют, волонтер)
+        if (!user) return 'Владелец: Неизвестно';
+        // В будущем можно добавить роли (Приют, Волонтер)
         return `Владелец: ${user.name}`;
     };
 
@@ -25,36 +23,32 @@ const AnnouncementCard = ({ announcement, onClick }) => {
         const date = new Date(dateString);
         const now = new Date();
         const diffInHours = Math.floor((now - date) / (1000 * 60 * 60));
-        
-        if (diffInHours < 1) {
-            return 'Только что';
-        } else if (diffInHours === 1) {
-            return '1 час назад';
-        } else if (diffInHours < 24) {
-            return `${diffInHours} часов назад`;
-        } else {
-            const diffInDays = Math.floor(diffInHours / 24);
-            return `${diffInDays} дней назад`;
-        }
+        if (diffInHours < 1) return 'Только что';
+        if (diffInHours < 24) return `${diffInHours} час(ов) назад`;
+        return `${Math.floor(diffInHours / 24)} дней назад`;
     };
 
     const statusTag = getStatusTag(announcement.is_featured);
-    // ДОБАВЛЕНО: Безопасное получение URL фото
     const imageUrl = announcement.photos && announcement.photos.length > 0 
         ? announcement.photos[0].path 
         : placeholderImage;
 
+    // Добавляем класс isSelected, если карточка выбрана
+    const cardClasses = `${styles.card} ${isSelected ? styles.selectedCard : ''}`;
+
     return (
-        <div className={styles.card} onClick={() => onClick && onClick(announcement)}>
+        <div className={cardClasses} onClick={() => onClick && onClick(announcement)}>
             <div className={styles.imageContainer}>
                 <img 
                     src={imageUrl} 
                     alt={announcement.pet_name}
                     className={styles.petImage}
                 />
-                <div className={`${styles.statusTag} ${statusTag.className}`}>
-                    {statusTag.text}
-                </div>
+                {statusTag && (
+                    <div className={`${styles.statusTag} ${statusTag.className}`}>
+                        {statusTag.text}
+                    </div>
+                )}
             </div>
             
             <div className={styles.content}>
@@ -66,27 +60,21 @@ const AnnouncementCard = ({ announcement, onClick }) => {
                     {announcement.description}
                 </p>
                 
-                <div className={styles.metaInfo}>
+                <div className={styles.metaGrid}>
                     <div className={styles.metaItem}>
                         <MapPin className={styles.icon} />
-                        {/* ИСПРАВЛЕНО: Адрес в поле location_address */}
                         <span>{announcement.location_address}</span>
                     </div>
-                    
                     <div className={styles.metaItem}>
                         <Clock className={styles.icon} />
-                        {/* ИСПРАВЛЕНО: Дата создания в created_at */}
                         <span>{formatTimeAgo(announcement.created_at)}</span>
                     </div>
-                    
                     <div className={styles.metaItem}>
                         <Palette className={styles.icon} />
                         <span>{announcement.color}</span>
                     </div>
-                    
                     <div className={styles.metaItem}>
                         <User className={styles.icon} />
-                        {/* ИСПРАВЛЕНО: Передаем `announcement.user` */}
                         <span>{getOwnerInfo(announcement.user)}</span>
                     </div>
                 </div>

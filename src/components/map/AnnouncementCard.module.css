@@ -1,24 +1,28 @@
+/* НОВЫЕ СТИЛИ ДЛЯ ГОРИЗОНТАЛЬНОЙ КАРТОЧКИ */
 .card {
-    background: white;
-    border-radius: 12px;
-    padding: 16px;
-    margin-bottom: 16px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    display: flex;
+    gap: 20px;
+    padding: 20px;
     cursor: pointer;
-    transition: all 0.2s ease;
-    border: 1px solid #e5e7eb;
+    transition: background-color 0.2s ease;
+    border-bottom: 1px solid var(--dark-slate);
 }
 
 .card:hover {
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
-    transform: translateY(-2px);
+    background-color: var(--dark-slate);
+}
+
+.selectedCard {
+    background-color: var(--dark-slate);
+    border-left: 3px solid var(--amber-yellow);
+    padding-left: 17px;
 }
 
 .imageContainer {
+    width: 200px;
+    height: 140px;
+    flex-shrink: 0;
     position: relative;
-    width: 100%;
-    height: 200px;
-    margin-bottom: 12px;
     border-radius: 8px;
     overflow: hidden;
 }
@@ -27,7 +31,6 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
-    border-radius: 8px;
 }
 
 .statusTag {
@@ -39,48 +42,46 @@
     font-size: 12px;
     font-weight: 600;
     color: white;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
 .urgentTag {
-    background: linear-gradient(135deg, #ef4444, #dc2626);
+    background-color: var(--red);
 }
 
-.importantTag {
-    background: linear-gradient(135deg, #f59e0b, #d97706);
+.importantTag { /* Задел на будущее */
+    background-color: var(--amber-yellow);
 }
 
 .defaultTag {
-    background: linear-gradient(135deg, #6b7280, #4b5563);
+    background-color: var(--cool-gray);
 }
 
 .content {
-    flex: 1;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
 }
 
 .title {
-    font-size: 16px;
-    font-weight: 600;
-    color: #1f2937;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--light-gray);
     margin: 0 0 8px 0;
-    line-height: 1.4;
 }
 
 .description {
     font-size: 14px;
-    color: #6b7280;
+    color: var(--cool-gray);
     margin: 0 0 12px 0;
     line-height: 1.5;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
+    flex-grow: 1; /* Заставляет мета-информацию прижаться к низу */
 }
 
-.metaInfo {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
+.metaGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: auto; /* Прижимает блок к низу */
 }
 
 .metaItem {
@@ -88,21 +89,20 @@
     align-items: center;
     gap: 8px;
     font-size: 13px;
-    color: #6b7280;
+    color: var(--cool-gray);
 }
 
 .icon {
     width: 14px;
     height: 14px;
     flex-shrink: 0;
-    color: #9ca3af;
+    color: var(--cool-gray);
 }
 
 .metaItem span {
-    flex: 1;
+    white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    white-space: nowrap;
 }
 
 /* Responsive design */

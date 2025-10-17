@@ -1,0 +1,55 @@
+.popup {
+    position: fixed;
+    width: 300px;
+    background-color: var(--dark-slate);
+    border: 1px solid var(--cool-gray);
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    transform: translate(-50%, calc(-100% - 15px)); /* Смещаем над точкой */
+    z-index: 1000;
+    padding: 12px;
+    pointer-events: all; /* Чтобы можно было кликать */
+}
+
+.closeButton {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: none;
+    border: none;
+    color: var(--cool-gray);
+    cursor: pointer;
+    padding: 0;
+}
+
+.content {
+    display: flex;
+    gap: 12px;
+}
+
+.petImage {
+    width: 70px;
+    height: 70px;
+    object-fit: cover;
+    border-radius: 4px;
+    flex-shrink: 0;
+}
+
+.info {
+    display: flex;
+    flex-direction: column;
+}
+
+.title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--light-gray);
+    margin: 0 0 4px 0;
+}
+
+.description {
+    font-size: 12px;
+    color: var(--cool-gray);
+    margin: 0;
+    line-height: 1.4;
+}
