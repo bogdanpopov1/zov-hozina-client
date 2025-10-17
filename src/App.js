@@ -6,6 +6,7 @@ import Layout from './components/common/Layout';
 import MapLayout from './components/common/MapLayout';
 import ProfilePage from './pages/ProfilePage';
 import CreateAnnouncementPage from './pages/CreateAnnouncementPage';
+import AnnouncementDetailPage from './pages/AnnouncementDetailPage';
 import ProtectedRoute from './components/common/ProtectedRoute';
 
 function App() {
@@ -25,6 +26,10 @@ function App() {
         <Route
           path="create-announcement"
           element={<CreateAnnouncementPage />}
+        />
+        <Route
+          path="announcements/:id"
+          element={<AnnouncementDetailPage />}
         />
       </Route>
 

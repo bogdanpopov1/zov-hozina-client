@@ -1,0 +1,29 @@
+.container {
+    position: relative;
+    width: 100%;
+}
+
+.suggestionsList {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background-color: var(--deep-blue);
+    border: 1px solid var(--cool-gray);
+    border-radius: 8px;
+    z-index: 10;
+    list-style: none;
+    padding: 8px 0;
+    margin-top: 4px;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.suggestionsList li {
+    padding: 10px 16px;
+    cursor: pointer;
+}
+
+.suggestionsList li:hover {
+    background-color: var(--dark-slate);
+}

@@ -3,7 +3,7 @@
 :root {
   --deep-blue: #1A2536;
   --dark-slate: #2D3748;
-  --amber-yellow: #EBB000;
+  --amber-yellow: rgb(212, 162, 0);
   --light-yellow: #e3d5a5;
   --light-gray: #F5F7FA;
   --cool-gray: #8494A8;

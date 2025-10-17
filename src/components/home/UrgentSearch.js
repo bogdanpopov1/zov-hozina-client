@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import styles from './UrgentSearch.module.css';
 import { MapPin, CheckCircle2, Clock } from 'lucide-react';
 import placeholderImage from '../../assets/stories/cat-illustration.svg';
 
 const UrgentSearchCard = ({ ad }) => {
-    const imageUrl = ad.photos && ad.photos.length > 0 ? ad.photos[0].path : placeholderImage; 
+    const navigate = useNavigate();
+    const imageUrl = ad.photos && ad.photos.length > 0 ? ad.photos[0].url : placeholderImage; 
 
     return (
-        <div className={styles.card}>
+        <div className={styles.card} onClick={() => navigate(`/announcements/${ad.announcement_id}`)}>
             <div className={styles.imageContainer}>
                 <img src={imageUrl} alt={`Фото ${ad.pet_breed}`} />
             </div>

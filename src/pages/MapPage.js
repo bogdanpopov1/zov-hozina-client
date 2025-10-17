@@ -54,23 +54,16 @@ const MapPage = () => {
     }, [selectedId]);
 
 
-    const handleCardClick = (announcement) => {
+    const handleSelection = (announcement) => {
         setSelectedId(announcement.announcement_id);
         if (announcement.latitude && announcement.longitude) {
-            setMapState(prev => ({ ...prev, center: [parseFloat(announcement.latitude), parseFloat(announcement.longitude)], zoom: 15 }));
+            setMapState(prev => ({
+                ...prev,
+                center: [parseFloat(announcement.latitude), parseFloat(announcement.longitude)],
+                zoom: 15 // Приближаем карту
+            }));
         }
     };
-
-    const handlePlacemarkClick = (announcement) => {
-        try {
-            if (announcement && announcement.announcement_id) {
-                setSelectedId(announcement.announcement_id);
-            }
-        } catch (error) {
-            console.error('Error handling placemark click:', error);
-        }
-    };
-
 
     if (loading || ymapsLoading) {
         return <div className={styles.loadingContainer}><div className={styles.loading}>Загрузка данных и карты...</div></div>;
@@ -98,7 +91,7 @@ const MapPage = () => {
                             <div key={announcement.announcement_id} data-id={announcement.announcement_id}>
                                 <AnnouncementCard
                                     announcement={announcement}
-                                    onClick={() => handleCardClick(announcement)}
+                                    onClick={handleSelection} 
                                     isSelected={selectedId === announcement.announcement_id}
                                 />
                             </div>
@@ -117,7 +110,7 @@ const MapPage = () => {
                         announcements={announcements}
                         mapState={mapState}
                         selectedId={selectedId}
-                        onPlacemarkClick={handlePlacemarkClick}
+                        onPlacemarkClick={handleSelection}
                     />
                 )}
             </div>
