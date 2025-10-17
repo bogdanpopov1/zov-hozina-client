@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react'; 
 import { useNavigate } from 'react-router-dom';
 import api from '../api/axiosConfig'; // <-- ИСПОЛЬЗУЕМ НАШ НОВЫЙ КЛИЕНТ
 import { useAuth } from '../context/AuthContext';
 import { useAnnouncement } from '../context/AnnouncementContext';
 import AuthModal from '../components/common/AuthModal';
+import ImageUploader from '../components/form/ImageUploader'; 
 import styles from './CreateAnnouncementPage.module.css';
 
 // Хук для "дебаунса" ввода, чтобы не слать запросы на каждый символ
@@ -21,6 +22,8 @@ const CreateAnnouncementPage = () => {
     const { user } = useAuth();
     const { quickFormData, resetQuickForm } = useAnnouncement();
 
+    const isSubmittingRef = useRef(false);
+
     const [formData, setFormData] = useState({
         announcement_type: 'lost',
         pet_type: 'dog',
@@ -36,7 +39,7 @@ const CreateAnnouncementPage = () => {
         age: '',
     });
 
-    // Состояния для DaData
+    const [selectedFiles, setSelectedFiles] = useState([]);
     const [suggestions, setSuggestions] = useState([]);
     const [isSuggestionsVisible, setSuggestionsVisible] = useState(false);
     const debouncedLocationInput = useDebounce(formData.location_address, 500);
@@ -107,34 +110,48 @@ const CreateAnnouncementPage = () => {
     };
 
     const submitData = async () => {
-        setSubmitting(true);
+        if (isSubmittingRef.current) {
+            return;
+        }
 
-        // Подготавливаем данные для отправки
+        isSubmittingRef.current = true;
+        setSubmitting(true);
+        
+        const data = new FormData();
         const dataToSend = {
             ...formData,
             pet_type: formData.pet_type === 'other' ? formData.other_pet_type : formData.pet_type,
         };
-        delete dataToSend.other_pet_type; // Удаляем временное поле
+        
+        for (const key in dataToSend) {
+            if (key !== 'other_pet_type' && dataToSend[key] !== null) {
+                data.append(key, dataToSend[key]);
+            }
+        }
+
+        selectedFiles.forEach(file => {
+            data.append('photos[]', file);
+        });
 
         try {
-            const response = await api.post('/api/announcements', dataToSend);
+            const response = await api.post('/api/announcements', data, {
+                headers: { 'Content-Type': 'multipart/form-data' },
+            });
             resetQuickForm();
-            navigate(`/map`); // Можно перенаправить на страницу объявления: /announcements/${response.data.announcement_id}
+            navigate(`/map`);
         } catch (err) {
             if (err.response?.status === 422) {
-                // Ошибки валидации
                 setErrors(err.response.data.errors);
             } else {
-                // Все остальные ошибки (включая 405, 500 и т.д.)
-                const errorMessage = err.response?.data?.message || err.message || 'Произошла непредвиденная ошибка.';
-                setErrors({ general: errorMessage });
+                setErrors({ general: err.response?.data?.message || 'Произошла непредвиденная ошибка.' });
             }
             console.error(err);
         } finally {
+            isSubmittingRef.current = false;
             setSubmitting(false);
         }
     };
-
+    
     useEffect(() => {
         if (user && isAuthModalOpen) {
             setAuthModalOpen(false);
@@ -207,6 +224,12 @@ const CreateAnnouncementPage = () => {
                                     <input type="number" id="age" name="age" value={formData.age} onChange={handleChange} min="0" />
                                 </div>
                             </div>
+                        </div>
+
+                        <div className={styles.formSection}>
+                            <h3>Фотографии</h3>
+                            <ImageUploader files={selectedFiles} onFilesChange={setSelectedFiles} />
+                            {errors.photos && <span className={styles.fieldError}>{errors.photos[0]}</span>}
                         </div>
 
                         <div className={styles.formSection}>

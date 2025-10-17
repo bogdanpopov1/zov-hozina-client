@@ -30,7 +30,7 @@ const AnnouncementCard = ({ announcement, onClick, isSelected }) => {
 
     const statusTag = getStatusTag(announcement.is_featured);
     const imageUrl = announcement.photos && announcement.photos.length > 0 
-        ? announcement.photos[0].path 
+        ? announcement.photos[0].url  
         : placeholderImage;
 
     // Добавляем класс isSelected, если карточка выбрана
