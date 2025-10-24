@@ -10,12 +10,12 @@ import styles from './CreateAnnouncementPage.module.css';
 import useDebounce from '../hooks/useDebounce';
 
 const CreateAnnouncementPage = () => {
-    // ... (вся логика, хуки и функции остаются БЕЗ ИЗМЕНЕНИЙ)
     const navigate = useNavigate();
     const { user } = useAuth();
-    const { quickFormData, resetQuickForm } = useAnnouncement();
+    const { quickFormData, resetQuickForm, announcementToEdit, clearAnnouncementToEdit } = useAnnouncement();
     const isSubmittingRef = useRef(false);
 
+    const [isEditMode, setIsEditMode] = useState(false);
     const [categories, setCategories] = useState([]);
     const [formData, setFormData] = useState({
         announcement_type: 'lost',
@@ -32,11 +32,15 @@ const CreateAnnouncementPage = () => {
         age: '',
     });
 
+    const [existingPhotos, setExistingPhotos] = useState([]);
+    const [newPhotos, setNewPhotos] = useState([]);
+    const [photosToDelete, setPhotosToDelete] = useState([]);
+    const [primaryPhotoId, setPrimaryPhotoId] = useState(null);
+
     const [addressSuggestions, setAddressSuggestions] = useState([]);
     const [isAddressSuggestionsVisible, setAddressSuggestionsVisible] = useState(false);
     const debouncedLocationInput = useDebounce(formData.location_address, 400);
 
-    const [selectedFiles, setSelectedFiles] = useState([]);
     const [isAuthModalOpen, setAuthModalOpen] = useState(false);
     const [errors, setErrors] = useState({});
     const [submitting, setSubmitting] = useState(false);
@@ -45,38 +49,62 @@ const CreateAnnouncementPage = () => {
         const fetchCategories = async () => {
             try {
                 const response = await api.get('/api/categories');
-                const activeCategories = response.data;
-                setCategories(activeCategories);
-
-                const quickCategory = activeCategories.find(c => c.slug.includes(quickFormData.pet_type));
-                if (quickCategory) {
-                    setFormData(prev => ({ ...prev, pet_type: quickCategory.name }));
-                } else if (activeCategories.length > 0) {
-                    setFormData(prev => ({ ...prev, pet_type: activeCategories[0].name }));
-                }
-            } catch (error) { console.error("Failed to fetch categories", error); }
+                setCategories(response.data);
+            } catch (error) {
+                console.error("Failed to fetch categories", error);
+            }
         };
         fetchCategories();
-    }, []);
+
+        return () => {
+            clearAnnouncementToEdit();
+        };
+    }, [clearAnnouncementToEdit]);
 
     useEffect(() => {
-        setFormData(prev => ({
-            ...prev,
-            announcement_type: quickFormData.adType || 'lost',
-            gender: quickFormData.gender || 'unknown',
-            location_address: quickFormData.location_address || '',
-            latitude: quickFormData.latitude || null,
-            longitude: quickFormData.longitude || null,
-        }));
-    }, [quickFormData]);
+        if (announcementToEdit) {
+            setIsEditMode(true);
+            setFormData({
+                announcement_type: announcementToEdit.announcement_type || 'lost',
+                pet_type: announcementToEdit.pet_type || '',
+                other_pet_type: '',
+                pet_name: announcementToEdit.pet_name || '',
+                pet_breed: announcementToEdit.pet_breed || '',
+                description: announcementToEdit.description || '',
+                location_address: announcementToEdit.location_address || '',
+                latitude: announcementToEdit.latitude || null,
+                longitude: announcementToEdit.longitude || null,
+                gender: announcementToEdit.gender || 'unknown',
+                color: announcementToEdit.color || '',
+                age: announcementToEdit.age || '',
+            });
+            setExistingPhotos(announcementToEdit.photos || []);
+            const primary = announcementToEdit.photos?.find(p => p.is_primary);
+            setPrimaryPhotoId(primary ? primary.photo_id : (announcementToEdit.photos?.[0]?.photo_id || null));
+        } else if (!isEditMode) {
+            setFormData(prev => ({
+                ...prev,
+                announcement_type: quickFormData.adType || 'lost',
+                gender: quickFormData.gender || 'unknown',
+                location_address: quickFormData.location_address || '',
+                latitude: quickFormData.latitude || null,
+                longitude: quickFormData.longitude || null,
+            }));
+        }
+    }, [announcementToEdit, quickFormData, isEditMode]);
 
     useEffect(() => {
         if (debouncedLocationInput.length > 2) {
             const url = "https://suggestions.dadata.ru/suggestions/api/4_1/rs/suggest/address";
             const token = process.env.REACT_APP_DADATA_API_KEY;
             const options = {
-                method: "POST", mode: "cors",
-                headers: { "Content-Type": "application/json", "Accept": "application/json", "Authorization": "Token " + token },
+                method: "POST",
+                mode: "cors",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Accept": "application/json",
+                    "Authorization": "Token " + token
+                },
                 body: JSON.stringify({ query: debouncedLocationInput, count: 5 })
             };
             fetch(url, options)
@@ -111,6 +139,15 @@ const CreateAnnouncementPage = () => {
         setFormData(prev => ({ ...prev, pet_breed: value }));
     };
 
+    const handleDeleteExistingPhoto = (photoId) => {
+        setExistingPhotos(prev => prev.filter(p => p.photo_id !== photoId));
+        setPhotosToDelete(prev => [...prev, photoId]);
+        if (primaryPhotoId === photoId) {
+            const remainingPhotos = existingPhotos.filter(p => p.photo_id !== photoId);
+            setPrimaryPhotoId(remainingPhotos.length > 0 ? remainingPhotos[0].photo_id : null);
+        }
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setErrors({});
@@ -125,24 +162,42 @@ const CreateAnnouncementPage = () => {
         if (isSubmittingRef.current) return;
         isSubmittingRef.current = true;
         setSubmitting(true);
-        
+
         const data = new FormData();
         const finalPetType = formData.pet_type === 'Другое' ? formData.other_pet_type : formData.pet_type;
         const dataToSend = { ...formData, pet_type: finalPetType };
-        delete dataToSend.other_pet_type;
+        const fieldsToDelete = ['other_pet_type', 'photos', 'created_at', 'updated_at', 'user'];
+        fieldsToDelete.forEach(field => delete dataToSend[field]);
 
         for (const key in dataToSend) {
             if (dataToSend[key] !== null && dataToSend[key] !== undefined) {
                 data.append(key, dataToSend[key]);
             }
         }
-        
-        selectedFiles.forEach(file => { data.append('photos[]', file); });
+
+        newPhotos.forEach(file => {
+            data.append('photos[]', file);
+        });
+
+        if (isEditMode) {
+            photosToDelete.forEach(id => data.append('photos_to_delete[]', id));
+            if (primaryPhotoId) {
+                data.append('primary_photo_id', primaryPhotoId);
+            }
+        }
 
         try {
-            await api.post('/api/announcements', data, { headers: { 'Content-Type': 'multipart/form-data' } });
-            resetQuickForm();
-            navigate(`/map`);
+            let response;
+            if (isEditMode) {
+                data.append('_method', 'PUT'); 
+                response = await api.post(`/api/announcements/${announcementToEdit.announcement_id}`, data);
+                clearAnnouncementToEdit();
+                navigate(`/announcements/${response.data.announcement_id}`);
+            } else {
+                response = await api.post('/api/announcements', data);
+                resetQuickForm();
+                navigate(`/map`);
+            }
         } catch (err) {
             if (err.response?.status === 422) {
                 setErrors(err.response.data.errors);
@@ -162,23 +217,24 @@ const CreateAnnouncementPage = () => {
         }
     }, [user, isAuthModalOpen]);
 
-    // --- НАЧАЛО ИСПРАВЛЕНИЙ В JSX ---
     return (
         <>
             <div className={styles.pageContainer}>
                 <div className={styles.formWrapper}>
-                    <h1>Новое объявление</h1>
-                    <p className={styles.subtitle}>Заполните все детали, чтобы повысить шансы на успешный поиск.</p>
-                    
-                    <form onSubmit={handleSubmit} noValidate>
-                        <div className={styles.formSection}>
-                            <h3>Тип объявления</h3>
-                            <div className={styles.buttonGroup}>
-                                <button type="button" onClick={() => handleChange({ target: { name: 'announcement_type', value: 'lost' } })} className={formData.announcement_type === 'lost' ? styles.active : ''}>Ищу питомца</button>
-                                <button type="button" onClick={() => handleChange({ target: { name: 'announcement_type', value: 'found' } })} className={formData.announcement_type === 'found' ? styles.active : ''}>Нашел питомца</button>
-                            </div>
-                        </div>
+                    <h1>{isEditMode ? 'Редактирование объявления' : 'Новое объявление'}</h1>
+                    <p className={styles.subtitle}>
+                        {isEditMode ? 'Обновите информацию о вашем питомце.' : 'Заполните все детали, чтобы повысить шансы на успешный поиск.'}
+                    </p>
 
+                    <div className={styles.formSection}>
+                        <h3>Тип объявления</h3>
+                        <div className={styles.buttonGroup}>
+                            <button type="button" onClick={() => handleChange({ target: { name: 'announcement_type', value: 'lost' } })} className={formData.announcement_type === 'lost' ? styles.active : ''}>Ищу питомца</button>
+                            <button type="button" onClick={() => handleChange({ target: { name: 'announcement_type', value: 'found' } })} className={formData.announcement_type === 'found' ? styles.active : ''}>Нашел питомца</button>
+                        </div>
+                    </div>
+
+                    <form onSubmit={handleSubmit}>
                         <div className={styles.formSection}>
                             <h3>Основная информация</h3>
                             <div className={styles.formGrid}>
@@ -190,27 +246,25 @@ const CreateAnnouncementPage = () => {
                                 <div className={styles.formGroup}>
                                     <label htmlFor="pet_type">Вид питомца</label>
                                     <select id="pet_type" name="pet_type" value={formData.pet_type} onChange={handleChange}>
+                                        <option value="">Выберите вид</option>
                                         {categories.map(cat => (
                                             <option key={cat.category_id} value={cat.name}>{cat.name}</option>
                                         ))}
                                         <option value="Другое">Другое</option>
                                     </select>
                                 </div>
-                                
                                 {formData.pet_type === 'Другое' && (
                                     <div className={styles.formGroup}>
                                         <label htmlFor="other_pet_type">Укажите вид</label>
-                                        <input type="text" id="other_pet_type" name="other_pet_type" value={formData.other_pet_type} onChange={handleChange} placeholder="Например, Енот" />
+                                        <input type="text" id="other_pet_type" name="other_pet_type" value={formData.other_pet_type} onChange={handleChange} />
                                     </div>
                                 )}
-
                                 <div className={styles.formGroup}>
                                     <label htmlFor="pet_breed">Порода</label>
                                     <BreedInput
                                         value={formData.pet_breed}
                                         onChange={handleBreedChange}
                                         categoryId={selectedCategoryId}
-                                        disabled={formData.pet_type === 'Другое'}
                                     />
                                 </div>
                                 <div className={styles.formGroup}>
@@ -228,36 +282,41 @@ const CreateAnnouncementPage = () => {
                                 </div>
                                 <div className={styles.formGroup}>
                                     <label htmlFor="age">Возраст (лет)</label>
-                                    <input type="number" id="age" name="age" value={formData.age} onChange={handleChange} min="0" />
+                                    <input type="number" id="age" name="age" value={formData.age} onChange={handleChange} />
                                 </div>
                             </div>
                         </div>
 
-                        {/* --- ВОССТАНОВЛЕННЫЙ БЛОК ДЛЯ ФОТОГРАФИЙ --- */}
                         <div className={styles.formSection}>
                             <h3>Фотографии</h3>
-                            <ImageUploader files={selectedFiles} onFilesChange={setSelectedFiles} />
+                            <ImageUploader
+                                existingPhotos={existingPhotos}
+                                newFiles={newPhotos}
+                                onNewFilesChange={setNewPhotos}
+                                onDeleteExisting={handleDeleteExistingPhoto}
+                                onSetPrimary={setPrimaryPhotoId}
+                                primaryPhotoId={primaryPhotoId}
+                            />
                             {errors.photos && <span className={styles.fieldError}>{errors.photos[0]}</span>}
                         </div>
-                        
+
                         <div className={styles.formSection}>
                             <h3>Описание и местоположение</h3>
                             <div className={styles.formGroup}>
                                 <label htmlFor="description">Подробное описание</label>
-                                <textarea id="description" name="description" value={formData.description} onChange={handleChange} rows="5" placeholder="Опишите особые приметы, характер, обстоятельства..."></textarea>
+                                <textarea id="description" name="description" value={formData.description} onChange={handleChange}></textarea>
                             </div>
-                            
                             <div className={`${styles.formGroup} ${styles.locationGroup}`}>
                                 <label htmlFor="location_address">Адрес</label>
-                                <input 
-                                    type="text" 
-                                    id="location_address" 
-                                    name="location_address" 
-                                    value={formData.location_address} 
-                                    onChange={handleChange} 
+                                <input
+                                    type="text"
+                                    id="location_address"
+                                    name="location_address"
+                                    value={formData.location_address}
+                                    onChange={handleChange}
                                     onFocus={() => setAddressSuggestionsVisible(true)}
                                     onBlur={() => setTimeout(() => setAddressSuggestionsVisible(false), 200)}
-                                    autoComplete="off" 
+                                    autoComplete="off"
                                 />
                                 {errors.location_address && <span className={styles.fieldError}>{errors.location_address[0]}</span>}
                                 {isAddressSuggestionsVisible && addressSuggestions.length > 0 && (
@@ -272,10 +331,9 @@ const CreateAnnouncementPage = () => {
                             </div>
                         </div>
 
-                        {errors.general && <p className={styles.error}>{errors.general}</p>}
-
+                        {errors.general && <div className={styles.error}>{errors.general}</div>}
                         <button type="submit" className={styles.submitButton} disabled={submitting}>
-                            {submitting ? 'Публикация...' : 'Опубликовать объявление'}
+                            {submitting ? 'Сохранение...' : (isEditMode ? 'Сохранить изменения' : 'Опубликовать объявление')}
                         </button>
                     </form>
                 </div>

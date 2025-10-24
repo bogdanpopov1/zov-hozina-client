@@ -48,12 +48,14 @@
     background-color: var(--red);
 }
 
-.importantTag { /* Задел на будущее */
-    background-color: var(--amber-yellow);
+.archivedTag {
+    background-color: var(--cool-gray);
+    color: var(--deep-blue);
 }
 
 .defaultTag {
-    background-color: var(--cool-gray);
+    background-color: var(--amber-yellow);
+    color: var(--deep-blue);
 }
 
 .content {
@@ -110,19 +112,15 @@
     .card {
         padding: 12px;
     }
-    
     .imageContainer {
         height: 160px;
     }
-    
     .title {
         font-size: 15px;
     }
-    
     .description {
         font-size: 13px;
     }
-    
     .metaItem {
         font-size: 12px;
     }

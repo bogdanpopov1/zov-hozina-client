@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import styles from './AuthModal.module.css'; // Создадим этот файл стилей следующим
+import styles from './AuthModal.module.css';
 import { X } from 'lucide-react';
 
 const AuthModal = ({ onClose }) => {
@@ -15,25 +15,28 @@ const AuthModal = ({ onClose }) => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
-        try {
-            if (isRegister) {
-                if (password !== passwordConfirmation) {
-                    setError('Пароли не совпадают');
-                    return;
-                }
-                await register({ name, email, password, password_confirmation: passwordConfirmation });
-            } else {
-                await login({ email, password });
+
+        let result;
+        if (isRegister) {
+            if (password !== passwordConfirmation) {
+                setError('Пароли не совпадают');
+                return;
             }
-            onClose(); // Закрываем модальное окно после успешного входа/регистрации
-        } catch (err) {
-            setError(err.response?.data?.message || 'Произошла ошибка. Попробуйте снова.');
+            result = await register({ name, email, password, password_confirmation: passwordConfirmation });
+        } else {
+            result = await login({ email, password });
+        }
+
+        if (result.success) {
+            onClose();
+        } else {
+            setError(result.error);
         }
     };
 
     return (
         <div className={styles.overlay} onClick={onClose}>
-            <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.modal} onClick={e => e.stopPropagation()}>
                 <button className={styles.closeButton} onClick={onClose}><X size={24} /></button>
                 <h2>{isRegister ? 'Регистрация' : 'Вход в аккаунт'}</h2>
                 <form onSubmit={handleSubmit}>
@@ -49,20 +52,17 @@ const AuthModal = ({ onClose }) => {
                     <button type="submit" className={styles.submitButton}>
                         {isRegister ? 'Зарегистрироваться' : 'Войти'}
                     </button>
+                    <div className={styles.separator}>или</div>
+                    <button type="button" className={styles.telegramButton}>
+                        Войти через Telegram
+                    </button>
                 </form>
-                <div className={styles.separator}>или</div>
-                
-                {/* ЗАДЕЛ НА БУДУЩЕЕ: АВТОРИЗАЦИЯ ЧЕРЕЗ СЕРВИСЫ */}
-                <button className={styles.telegramButton}>
-                    {/* <FaTelegramPlane /> */} Войти через Telegram
-                </button>
-
-                <p className={styles.toggleForm}>
+                <div className={styles.toggleForm}>
                     {isRegister ? 'Уже есть аккаунт?' : 'Еще нет аккаунта?'}
                     <button onClick={() => setIsRegister(!isRegister)}>
                         {isRegister ? 'Войти' : 'Создать'}
                     </button>
-                </p>
+                </div>
             </div>
         </div>
     );

@@ -6,12 +6,9 @@ const AuthContext = createContext(null);
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [token, setToken] = useState(localStorage.getItem('token'));
-    // НОВОЕ СОСТОЯНИЕ: отслеживаем первоначальную загрузку/проверку аутентификации
     const [isLoading, setIsLoading] = useState(true);
-
     const API_URL = process.env.REACT_APP_API_URL;
 
-    // ИЗМЕНЕННЫЙ useEffect: теперь он управляет состоянием isLoading
     useEffect(() => {
         const checkLoggedIn = async () => {
             if (token) {
@@ -20,34 +17,61 @@ export const AuthProvider = ({ children }) => {
                     const response = await axios.get(`${API_URL}/api/user`);
                     setUser(response.data);
                 } catch (error) {
-                    // Если токен недействителен, очищаем все
                     localStorage.removeItem('token');
                     setToken(null);
                     setUser(null);
                     delete axios.defaults.headers.common['Authorization'];
                 } finally {
-                    // Проверка завершена (успешно или нет), убираем загрузку
                     setIsLoading(false);
                 }
             } else {
-                // Если токена нет, проверять нечего, загрузка завершена
                 setIsLoading(false);
             }
         };
-
         checkLoggedIn();
     }, [token, API_URL]);
 
     const login = async (credentials) => {
-        const response = await axios.post(`${API_URL}/api/login`, credentials);
-        const { token, user } = response.data;
-        localStorage.setItem('token', token);
-        setToken(token); // Это вызовет повторный запуск useEffect и установит user
+        try {
+            const response = await axios.post(`${API_URL}/api/login`, credentials);
+            const { token, user } = response.data;
+            localStorage.setItem('token', token);
+            setToken(token);
+            setUser(user);
+            return { success: true };
+        } catch (err) {
+            let errorMessage = 'Произошла ошибка. Попробуйте снова.';
+            if (err.response && err.response.data) {
+                const errors = err.response.data.errors;
+                if (errors) {
+                    const firstErrorKey = Object.keys(errors)[0];
+                    errorMessage = errors[firstErrorKey][0];
+                } else {
+                    errorMessage = err.response.data.message || errorMessage;
+                }
+            }
+            return { success: false, error: errorMessage };
+        }
     };
 
     const register = async (data) => {
-        await axios.post(`${API_URL}/api/register`, data);
-        await login({ email: data.email, password: data.password });
+        try {
+            await axios.post(`${API_URL}/api/register`, data);
+            const loginResult = await login({ email: data.email, password: data.password });
+            return loginResult;
+        } catch (err) {
+            let errorMessage = 'Ошибка при регистрации. Попробуйте снова.';
+            if (err.response && err.response.data) {
+                const errors = err.response.data.errors;
+                if (errors) {
+                    const firstErrorKey = Object.keys(errors)[0];
+                    errorMessage = errors[firstErrorKey][0];
+                } else {
+                    errorMessage = err.response.data.message || errorMessage;
+                }
+            }
+            return { success: false, error: errorMessage };
+        }
     };
 
     const logout = async () => {
@@ -62,15 +86,14 @@ export const AuthProvider = ({ children }) => {
             delete axios.defaults.headers.common['Authorization'];
         }
     };
-    
+
     const updateUser = async (data) => {
         const response = await axios.put(`${API_URL}/api/user`, data);
         setUser(response.data);
     };
 
     return (
-        // Добавляем isLoading в контекст
-        <AuthContext.Provider value={{ user, login, register, logout, updateUser, isLoading }}>
+        <AuthContext.Provider value={{ user, token, isLoading, login, register, logout, updateUser }}>
             {children}
         </AuthContext.Provider>
     );

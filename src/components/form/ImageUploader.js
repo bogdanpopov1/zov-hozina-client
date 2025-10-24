@@ -1,30 +1,39 @@
 import React, { useRef } from 'react';
 import styles from './ImageUploader.module.css';
-import { UploadCloud, X } from 'lucide-react';
+import { UploadCloud, X, Star } from 'lucide-react';
 
-const ImageUploader = ({ files, onFilesChange, maxFiles = 5 }) => {
+const ImageUploader = ({
+    existingPhotos = [],
+    newFiles = [],
+    onNewFilesChange,
+    onDeleteExisting,
+    onSetPrimary,
+    primaryPhotoId,
+    maxFiles = 5
+}) => {
     const fileInputRef = useRef(null);
+    const totalPhotos = existingPhotos.length + newFiles.length;
 
     const handleFileChange = (event) => {
-        const newFiles = Array.from(event.target.files);
-        if (newFiles.length > 0) {
-            const combined = [...files, ...newFiles].slice(0, maxFiles);
-            onFilesChange(combined);
+        const addedFiles = Array.from(event.target.files);
+        if (addedFiles.length > 0) {
+            const combined = [...newFiles, ...addedFiles].slice(0, maxFiles - existingPhotos.length);
+            onNewFilesChange(combined);
         }
     };
 
-    const handleRemoveFile = (indexToRemove) => {
-        const filtered = files.filter((_, index) => index !== indexToRemove);
-        onFilesChange(filtered);
+    const handleRemoveNewFile = (indexToRemove) => {
+        const filtered = newFiles.filter((_, index) => index !== indexToRemove);
+        onNewFilesChange(filtered);
     };
 
     const handleDrop = (event) => {
         event.preventDefault();
         event.stopPropagation();
-        const newFiles = Array.from(event.dataTransfer.files);
-        if (newFiles.length > 0) {
-            const combined = [...files, ...newFiles].slice(0, maxFiles);
-            onFilesChange(combined);
+        const addedFiles = Array.from(event.dataTransfer.files);
+        if (addedFiles.length > 0) {
+            const combined = [...newFiles, ...addedFiles].slice(0, maxFiles - existingPhotos.length);
+            onNewFilesChange(combined);
         }
     };
 
@@ -35,44 +44,56 @@ const ImageUploader = ({ files, onFilesChange, maxFiles = 5 }) => {
 
     return (
         <div className={styles.uploaderContainer}>
-            <div
-                className={styles.dropzone}
-                onClick={() => fileInputRef.current.click()}
-                onDrop={handleDrop}
-                onDragOver={handleDragOver}
-            >
-                <input
-                    type="file"
-                    multiple
-                    accept="image/png, image/jpeg, image/gif"
-                    ref={fileInputRef}
-                    onChange={handleFileChange}
-                    style={{ display: 'none' }}
-                />
-                <UploadCloud size={48} className={styles.uploadIcon} />
-                <p>
-                    <b>Нажмите, чтобы выбрать файлы</b> или перетащите их сюда
-                </p>
-                <small>PNG, JPG, GIF до 2MB. Не более {maxFiles} файлов.</small>
-            </div>
-            {files.length > 0 && (
+            {totalPhotos < maxFiles && (
+                <div
+                    className={styles.dropzone}
+                    onClick={() => fileInputRef.current.click()}
+                    onDrop={handleDrop}
+                    onDragOver={handleDragOver}
+                >
+                    <input
+                        type="file"
+                        ref={fileInputRef}
+                        onChange={handleFileChange}
+                        multiple
+                        accept="image/jpeg,image/png,image/gif"
+                        style={{ display: 'none' }}
+                    />
+                    <UploadCloud size={48} className={styles.uploadIcon} />
+                    <p>Нажмите, чтобы выбрать файлы или перетащите их сюда</p>
+                    <small>PNG, JPG, GIF до 2MB. Осталось: {maxFiles - totalPhotos}</small>
+                </div>
+            )}
+
+            {(existingPhotos.length > 0 || newFiles.length > 0) && (
                 <div className={styles.previewGrid}>
-                    {files.map((file, index) => (
+                    {existingPhotos.map(photo => (
+                        <div key={photo.photo_id} className={styles.previewItem}>
+                            <img src={photo.url} alt="Existing" className={styles.previewImage} />
+                            <div className={styles.buttonOverlay}>
+                                <button type="button" onClick={() => onSetPrimary(photo.photo_id)} className={styles.primaryButton}>
+                                    <Star size={16} fill={primaryPhotoId === photo.photo_id ? 'var(--amber-yellow)' : 'none'} />
+                                </button>
+                                <button type="button" onClick={() => onDeleteExisting(photo.photo_id)} className={styles.removeButton}>
+                                    <X size={16} />
+                                </button>
+                            </div>
+                            {primaryPhotoId === photo.photo_id && <div className={styles.primaryBadge}>Главное</div>}
+                        </div>
+                    ))}
+                    {newFiles.map((file, index) => (
                         <div key={index} className={styles.previewItem}>
                             <img
                                 src={URL.createObjectURL(file)}
-                                alt={`preview ${index}`}
+                                alt={file.name}
                                 className={styles.previewImage}
-                                onLoad={(e) => URL.revokeObjectURL(e.target.src)} // Очистка после загрузки
+                                onLoad={e => URL.revokeObjectURL(e.target.src)}
                             />
-                            <button
-                                type="button"
-                                className={styles.removeButton}
-                                onClick={() => handleRemoveFile(index)}
-                            >
-                                <X size={16} />
-                            </button>
-                            {index === 0 && <div className={styles.primaryBadge}>Главное</div>}
+                             <div className={styles.buttonOverlay}>
+                                <button type="button" onClick={() => handleRemoveNewFile(index)} className={styles.removeButtonFull}>
+                                    <X size={16} />
+                                </button>
+                            </div>
                         </div>
                     ))}
                 </div>

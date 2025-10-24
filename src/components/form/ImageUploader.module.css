@@ -45,6 +45,7 @@
     padding-top: 100%; /* Aspect ratio 1:1 */
     border-radius: 8px;
     overflow: hidden;
+    background-color: var(--deep-blue);
 }
 
 .previewImage {
@@ -56,7 +57,38 @@
     object-fit: cover;
 }
 
-.removeButton {
+.buttonOverlay {
+    position: absolute;
+    top: 0;
+    right: 0;
+    display: flex;
+    gap: 4px;
+    padding: 6px;
+}
+
+.removeButton, .primaryButton {
+    background-color: rgba(0, 0, 0, 0.6);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 0;
+    transition: background-color 0.2s;
+}
+
+.removeButton:hover {
+    background-color: rgba(234, 67, 53, 0.8);
+}
+.primaryButton:hover {
+    background-color: rgba(212, 162, 0, 0.8);
+}
+
+.removeButtonFull {
     position: absolute;
     top: 6px;
     right: 6px;
