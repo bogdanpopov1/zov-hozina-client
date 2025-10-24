@@ -1,5 +1,6 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import axios from 'axios';
+import api from '../api/axiosConfig'; // Используем настроенный экземпляр
 
 const AuthContext = createContext(null);
 
@@ -12,15 +13,15 @@ export const AuthProvider = ({ children }) => {
     useEffect(() => {
         const checkLoggedIn = async () => {
             if (token) {
-                axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+                api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
                 try {
-                    const response = await axios.get(`${API_URL}/api/user`);
+                    const response = await api.get(`/api/user`);
                     setUser(response.data);
                 } catch (error) {
                     localStorage.removeItem('token');
                     setToken(null);
                     setUser(null);
-                    delete axios.defaults.headers.common['Authorization'];
+                    delete api.defaults.headers.common['Authorization'];
                 } finally {
                     setIsLoading(false);
                 }
@@ -29,11 +30,11 @@ export const AuthProvider = ({ children }) => {
             }
         };
         checkLoggedIn();
-    }, [token, API_URL]);
+    }, [token]);
 
     const login = async (credentials) => {
         try {
-            const response = await axios.post(`${API_URL}/api/login`, credentials);
+            const response = await api.post(`/api/login`, credentials);
             const { token, user } = response.data;
             localStorage.setItem('token', token);
             setToken(token);
@@ -56,7 +57,7 @@ export const AuthProvider = ({ children }) => {
 
     const register = async (data) => {
         try {
-            await axios.post(`${API_URL}/api/register`, data);
+            await api.post(`/api/register`, data);
             const loginResult = await login({ email: data.email, password: data.password });
             return loginResult;
         } catch (err) {
@@ -76,24 +77,37 @@ export const AuthProvider = ({ children }) => {
 
     const logout = async () => {
         try {
-            await axios.post(`${API_URL}/api/logout`);
+            await api.post(`/api/logout`);
         } catch (error) {
             console.error("Logout request failed, but clearing client-side session anyway.", error);
         } finally {
             setUser(null);
             setToken(null);
             localStorage.removeItem('token');
-            delete axios.defaults.headers.common['Authorization'];
+            delete api.defaults.headers.common['Authorization'];
         }
     };
 
     const updateUser = async (data) => {
-        const response = await axios.put(`${API_URL}/api/user`, data);
+        const response = await api.put(`/api/user`, data);
         setUser(response.data);
     };
 
+    const updateVolunteerStatus = async (isVolunteer) => {
+        try {
+            const response = await api.put('/api/user/volunteer-status', { is_volunteer: isVolunteer });
+            setUser(response.data); // Обновляем пользователя новыми данными с сервера
+            return { success: true };
+        } catch (error) {
+            console.error("Failed to update volunteer status", error);
+            return { success: false, error: "Не удалось обновить статус" };
+        }
+    };
+
+    const value = { user, isLoading, login, register, logout, updateUser, updateVolunteerStatus };
+
     return (
-        <AuthContext.Provider value={{ user, token, isLoading, login, register, logout, updateUser }}>
+        <AuthContext.Provider value={value}>
             {children}
         </AuthContext.Provider>
     );

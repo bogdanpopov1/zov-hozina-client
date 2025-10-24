@@ -1,0 +1,124 @@
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal {
+    background-color: var(--dark-slate);
+    padding: 30px;
+    border-radius: 16px;
+    width: 90%;
+    max-width: 600px;
+    position: relative;
+    color: var(--light-gray);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.closeButton {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: none;
+    border: none;
+    color: var(--cool-gray);
+    cursor: pointer;
+}
+
+.modal h3 {
+    text-align: center;
+    font-size: 20px;
+    margin-bottom: 0;
+}
+
+.modal p {
+    text-align: center;
+    color: var(--cool-gray);
+    font-size: 15px;
+    margin-top: -8px;
+}
+
+.mapContainer {
+    width: 100%;
+    height: 350px;
+    border-radius: 8px;
+    background-color: var(--deep-blue);
+}
+
+.controls {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+}
+
+.formGroup {
+    flex: 1;
+}
+
+.formGroup label {
+    display: block;
+    font-size: 14px;
+    color: var(--cool-gray);
+    margin-bottom: 8px;
+}
+
+.formGroup input[type="text"] {
+    width: 100%;
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid var(--cool-gray);
+    background-color: var(--deep-blue);
+    color: var(--light-gray);
+}
+
+.slider {
+    width: 100%;
+    cursor: pointer;
+}
+
+.actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 16px;
+}
+
+.cancelButton, .saveButton {
+    padding: 10px 20px;
+    border-radius: 8px;
+    border: none;
+    font-weight: 600;
+    cursor: pointer;
+    transition: filter 0.2s;
+}
+
+.cancelButton {
+    background-color: var(--cool-gray);
+    color: var(--light-gray);
+}
+
+.saveButton {
+    background-color: var(--amber-yellow);
+    color: var(--light-gray);
+}
+
+.saveButton:disabled {
+    background-color: var(--cool-gray);
+    cursor: not-allowed;
+}
+
+.error {
+    color: var(--red);
+    font-size: 14px;
+    text-align: center;
+}

@@ -207,6 +207,12 @@
     color: var(--light-gray);
 }
 
+
+.fullWidthSection {
+    grid-column: 1 / -1;
+}
+
+
 @media (max-width: 992px) {
     .contentWrapper {
         grid-template-columns: 1fr;
