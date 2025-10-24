@@ -114,54 +114,20 @@ html, body {
   }
 }
 
-/* Стили для темной карты Яндекс.Карт */
-.dark-map-container {
-  background-color: #1a1a1a !important;
-  filter: invert(1) hue-rotate(180deg) brightness(0.8) contrast(1.1) !important;
+
+
+
+
+
+/* --- СТИЛИ ДЛЯ ТЕМНОЙ КАРТЫ YANDEX API v2.1 --- */
+/* Применяем фильтры, только когда у контейнера есть класс .dark-mode */
+.dark-mode {
+    filter: invert(1) hue-rotate(180deg) brightness(1.25) contrast(0.9);
 }
 
-/* Отменяем инверсию для балунов */
-.dark-map-container [class*="ymaps-"][class*="-balloon"] {
-  filter: invert(1) hue-rotate(180deg) brightness(1.25) contrast(0.9) !important;
-  background-color: #2d2d2d !important;
-  border: 1px solid #444 !important;
-  color: #fff !important;
-}
-
-.dark-map-container [class*="ymaps-"][class*="-balloon__content"] {
-  filter: invert(1) hue-rotate(180deg) brightness(1.25) contrast(0.9) !important;
-  background-color: #2d2d2d !important;
-  color: #fff !important;
-}
-
-.dark-map-container [class*="ymaps-"][class*="-balloon__tail"] {
-  filter: invert(1) hue-rotate(180deg) brightness(1.25) contrast(0.9) !important;
-  background-color: #2d2d2d !important;
-  border-color: #444 !important;
-}
-
-.dark-map-container [class*="ymaps-"][class*="-balloon__close"] {
-  filter: invert(1) hue-rotate(180deg) brightness(1.25) contrast(0.9) !important;
-  color: #fff !important;
-}
-
-.dark-map-container [class*="ymaps-"][class*="-balloon__close"]:hover {
-  color: #ccc !important;
-}
-
-/* Отменяем инверсию для контролов */
-.dark-map-container [class*="ymaps-"][class*="-controls__control"] {
-  filter: invert(1) hue-rotate(180deg) brightness(1.25) contrast(0.9) !important;
-  background-color: rgba(45, 45, 45, 0.9) !important;
-  border: 1px solid #444 !important;
-}
-
-.dark-map-container [class*="ymaps-"][class*="-controls__control_toolbar"] {
-  filter: invert(1) hue-rotate(180deg) brightness(1.25) contrast(0.9) !important;
-  background-color: rgba(45, 45, 45, 0.9) !important;
-}
-
-.dark-map-container [class*="ymaps-"][class*="-controls__control_toolbar"] [class*="-button"] {
-  filter: invert(1) hue-rotate(180deg) brightness(1.25) contrast(0.9) !important;
-  color: #fff !important;
+/* Отменяем фильтр для элементов управления и балунов, чтобы они выглядели нормально */
+.dark-mode .ymaps-2-1-79-controls__control,
+.dark-mode .ymaps-2-1-79-balloon,
+.dark-mode .ymaps-2-1-79-hint {
+    filter: invert(1) hue-rotate(180deg) brightness(2) contrast(0.9);
 }

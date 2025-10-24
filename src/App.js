@@ -33,7 +33,6 @@ function App() {
         />
       </Route>
 
-      {/* ИСПРАВЛЕНО: Маршрут для карты теперь использует свой собственный Layout */}
       <Route element={<MapLayout />}>
         <Route path="map" element={<MapPage />} />
       </Route>

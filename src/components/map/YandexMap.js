@@ -1,53 +1,67 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import styles from '../../pages/MapPage.module.css';
 
-const COLOR_DEFAULT = '#0095FF';
-const COLOR_URGENT = '#FF0000';
-const COLOR_SELECTED = '#FFD700';
-
-const YandexMap = ({
-    announcements,
-    mapState,
-    selectedId,
-    onPlacemarkClick,
-    ymaps // Получаем готовый API через props
-}) => {
-    const mapRef = useRef(null);
+const YandexMap = ({ announcements, mapState, selectedId, onPlacemarkClick }) => {
+    const mapContainerRef = useRef(null);
     const mapInstanceRef = useRef(null);
+    const [ymapsApi, setYmapsApi] = useState(null);
     const navigate = useNavigate();
 
-    // Эффект для инициализации карты (без изменений)
+    // Эффект №1: Ожидание API
     useEffect(() => {
-        if (!ymaps || !mapRef.current || mapInstanceRef.current) {
+        const checkApi = () => {
+            if (window.ymaps) {
+                window.ymaps.ready(() => setYmapsApi(window.ymaps));
+            } else {
+                setTimeout(checkApi, 100);
+            }
+        };
+        checkApi();
+    }, []);
+
+    // Эффект №2: Создание карты и контролов
+    useEffect(() => {
+        if (!ymapsApi || !mapContainerRef.current) {
             return;
         }
 
-        mapInstanceRef.current = new ymaps.Map(mapRef.current, {
-            center: mapState.center,
-            zoom: mapState.zoom,
-            controls: mapState.controls,
-        });
+        if (!mapInstanceRef.current) {
+            const map = new ymapsApi.Map(mapContainerRef.current, {
+                center: mapState.center.slice().reverse(),
+                zoom: mapState.zoom,
+                controls: ['zoomControl'],
+                // Начинаем со стандартного типа карты, CSS сделает ее темной
+                type: 'yandex#map'
+            });
 
-        // Вся ваша логика для темной темы остается здесь без изменений
-        mapRef.current.style.backgroundColor = '#1a1a1a';
-        setTimeout(() => {
-            if (mapRef.current) {
-                mapRef.current.style.filter = 'invert(1) hue-rotate(180deg) brightness(0.8) contrast(1.1)';
-                const style = document.createElement('style');
-                style.id = 'yandex-map-dark-theme';
-                style.textContent = `
-                    /* Все ваши стили для темной темы */
-                    .dark-map-container [class*="ymaps-"][class*="-balloon"] { filter: invert(1) hue-rotate(180deg) brightness(1.25) contrast(0.9) !important; /* ... */ }
-                    /* ... и так далее для всех элементов */
-                `;
-                const existingStyle = document.getElementById('yandex-map-dark-theme');
-                if (existingStyle) {
-                    existingStyle.remove();
+            // --- КЛЮЧЕВАЯ ЛОГИКА ПЕРЕКЛЮЧЕНИЯ ---
+            const typeSelector = new ymapsApi.control.Button({
+                data: { content: 'Спутник' },
+                options: { selectOnClick: false, maxWidth: 150 }
+            });
+
+            typeSelector.events.add('click', () => {
+                const mapContainer = mapContainerRef.current;
+                if (map.getType() === 'yandex#map') {
+                    map.setType('yandex#hybrid');
+                    typeSelector.data.set('content', 'Схема');
+                    // Убираем CSS-класс, чтобы спутник выглядел нормально
+                    mapContainer.classList.remove('dark-mode');
+                } else {
+                    map.setType('yandex#map');
+                    typeSelector.data.set('content', 'Спутник');
+                    // Добавляем CSS-класс, чтобы применить темную тему
+                    mapContainer.classList.add('dark-mode');
                 }
-                document.head.appendChild(style);
-                mapRef.current.classList.add('dark-map-container');
-            }
-        }, 1000);
+            });
+            map.controls.add(typeSelector, { float: 'right' });
+
+            mapInstanceRef.current = map;
+
+            // Сразу после создания применяем темную тему
+            mapContainerRef.current.classList.add('dark-mode');
+        }
 
         return () => {
             if (mapInstanceRef.current) {
@@ -55,204 +69,71 @@ const YandexMap = ({
                 mapInstanceRef.current = null;
             }
         };
-    }, [ymaps]);
+    }, [ymapsApi]);
 
-    // Эффект для обновления центра, меток и т.д.
+    // Эффект №3: Обновление центра карты
+    useEffect(() => {
+        if (mapInstanceRef.current) {
+            mapInstanceRef.current.setCenter(mapState.center.slice().reverse(), mapState.zoom);
+        }
+    }, [mapState]);
+
+    // Эффект №4: Обновление маркеров
     useEffect(() => {
         const map = mapInstanceRef.current;
-        if (!map || !ymaps) {
-            return;
-        }
-
-        map.setCenter(mapState.center, mapState.zoom, {
-            duration: 300,
-            checkZoomRange: true
-        });
+        if (!map) return;
 
         map.geoObjects.removeAll();
+        map.balloon.close();
 
         announcements.forEach(ad => {
             if (ad.latitude && ad.longitude) {
                 const isSelected = selectedId === ad.announcement_id;
-                let iconColor = isSelected ? COLOR_SELECTED : (ad.is_featured ? COLOR_URGENT : COLOR_DEFAULT);
-
-                // --- ИЗМЕНЕНИЕ №1: УЛУЧШАЕМ КОНТЕНТ БАЛУНА, ДОБАВЛЯЯ ССЫЛКУ ---
-                const balloonContent = `
-                    <div style="font-family: 'Manrope', sans-serif; max-width: 250px; padding: 10px;">
-                        <div style="display: flex; gap: 12px; align-items: flex-start;">
-                            <img src="${ad.photos?.[0]?.url || '/placeholder-cat.svg'}" 
-                                 alt="${ad.pet_name}" 
-                                 style="width: 70px; height: 70px; object-fit: cover; border-radius: 4px; flex-shrink: 0;">
-                            <div style="flex: 1;">
-                                <h4 style="margin: 0 0 8px 0; font-size: 16px; font-weight: 700;">
-                                    ${ad.pet_breed || ad.pet_type}, "${ad.pet_name}"
-                                </h4>
-                                <p style="margin: 0 0 12px 0; font-size: 14px; color: #ccc; line-height: 1.4;">
-                                    ${ad.description ? ad.description.substring(0, 70) + '...' : 'Описание отсутствует'}
-                                </p>
-                            </div>
-                        </div>
-                        <a id="balloon-link-${ad.announcement_id}" href="/announcements/${ad.announcement_id}" 
-                           style="display: block; text-align: center; margin-top: 12px; padding: 8px; background-color: #EBB000; color: #1A2536; border-radius: 6px; text-decoration: none; font-weight: 600;">
-                            Подробнее
-                        </a>
-                    </div>
-                `;
-
-                const placemark = new ymaps.Placemark(
-                    [parseFloat(ad.latitude), parseFloat(ad.longitude)],
-                    {
-                        // Передаем новый контент в балун
-                        balloonContent: balloonContent
-                    },
-                    {
-                        preset: 'islands#dotIcon',
-                        iconColor: iconColor,
-                        hideIconOnBalloonOpen: false // Важно, чтобы иконка не исчезала
-                    }
+                
+                const placemark = new ymapsApi.Placemark(
+                    [ad.latitude, ad.longitude],
+                    {},
+                    { preset: isSelected ? 'islands#yellowCircleIcon' : 'islands#blueCircleIcon' }
                 );
 
-                // --- ИЗМЕНЕНИЕ №2: КЛИК ПО МЕТКЕ ТЕПЕРЬ ПРОСТО ВЫЗЫВАЕТ ONCLICK ---
-                placemark.events.add('click', () => {
-                    if (onPlacemarkClick) {
-                        onPlacemarkClick(ad);
-                    }
-                });
+                placemark.events.add('click', () => onPlacemarkClick(ad));
                 
-                // --- ИЗМЕНЕНИЕ №3: АВТОМАТИЧЕСКИ ОТКРЫВАЕМ БАЛУН ДЛЯ ВЫБРАННОЙ МЕТКИ ---
                 if (isSelected) {
-                    // Используем setTimeout, чтобы балун открылся после возможного перемещения карты
-                    setTimeout(() => {
-                        if (placemark.balloon && !placemark.balloon.isOpen()) {
-                            placemark.balloon.open();
-                        }
-                    }, 300);
+                    map.balloon.open(placemark.geometry.getCoordinates(), {
+                        contentHeader: `${ad.pet_breed}, "${ad.pet_name}"`,
+                        contentBody: `<p>${ad.description || ''}</p>`,
+                        contentFooter: `<a href="/announcements/${ad.announcement_id}" id="balloon-link-${ad.announcement_id}" style="color: #1a73e8;">Подробнее...</a>`
+                    });
                 }
-
-                // --- ИЗМЕНЕНИЕ №4: ПЕРЕХВАТЫВАЕМ КЛИК ПО ССЫЛКЕ ВНУТРИ БАЛУНА ---
-                placemark.balloon.events.add('open', () => {
-                    const link = document.getElementById(`balloon-link-${ad.announcement_id}`);
-                    if (link) {
-                        // Вешаем обработчик, который будет использовать React Router
-                        link.addEventListener('click', (e) => {
-                            e.preventDefault(); // Отменяем стандартный переход по href
-                            navigate(`/announcements/${ad.announcement_id}`);
-                        });
-                    }
-                });
-
-
-                // Вся ваша логика для появления/исчезновения балуна при наведении остается без изменений
-                let balloonTimeout = null;
-                let isBalloonOpen = false;
-                let isMouseOverPlacemark = false;
-                let isMouseOverBalloon = false;
-
-                // Обработчик наведения мыши на метку
-                placemark.events.add('mouseenter', () => {
-                    try {
-                        isMouseOverPlacemark = true;
-                        if (balloonTimeout) {
-                            clearTimeout(balloonTimeout);
-                            balloonTimeout = null;
-                        }
-
-                        balloonTimeout = setTimeout(() => {
-                            if (!isBalloonOpen && isMouseOverPlacemark && placemark && placemark.balloon) {
-                                placemark.balloon.open();
-                                isBalloonOpen = true;
-                            }
-                        }, 200); // Задержка 200мс
-                    } catch (error) {
-                        console.error('Error handling mouseenter:', error);
-                    }
-                });
-
-                // Обработчик увода мыши с метки
-                placemark.events.add('mouseleave', () => {
-                    try {
-                        isMouseOverPlacemark = false;
-                        if (balloonTimeout) {
-                            clearTimeout(balloonTimeout);
-                            balloonTimeout = null;
-                        }
-
-                        balloonTimeout = setTimeout(() => {
-                            if (isBalloonOpen && !isMouseOverPlacemark && !isMouseOverBalloon && placemark && placemark.balloon) {
-                                placemark.balloon.close();
-                                isBalloonOpen = false;
-                            }
-                        }, 300); // Задержка 300мс
-                    } catch (error) {
-                        console.error('Error handling mouseleave:', error);
-                    }
-                });
-
-                // Обработчики событий балуна
-                try {
-                    placemark.balloon.events.add('open', () => {
-                        try {
-                            isBalloonOpen = true;
-                        } catch (error) {
-                            console.error('Error in balloon open event:', error);
-                        }
-                    });
-
-                    placemark.balloon.events.add('close', () => {
-                        try {
-                            isBalloonOpen = false;
-                            isMouseOverBalloon = false;
-                            if (balloonTimeout) {
-                                clearTimeout(balloonTimeout);
-                                balloonTimeout = null;
-                            }
-                        } catch (error) {
-                            console.error('Error in balloon close event:', error);
-                        }
-                    });
-
-                    // Обработчики наведения мыши на балун
-                    placemark.balloon.events.add('mouseenter', () => {
-                        try {
-                            isMouseOverBalloon = true;
-                            if (balloonTimeout) {
-                                clearTimeout(balloonTimeout);
-                                balloonTimeout = null;
-                            }
-                        } catch (error) {
-                            console.error('Error in balloon mouseenter event:', error);
-                        }
-                    });
-
-                    placemark.balloon.events.add('mouseleave', () => {
-                        try {
-                            isMouseOverBalloon = false;
-                            if (balloonTimeout) {
-                                clearTimeout(balloonTimeout);
-                                balloonTimeout = null;
-                            }
-
-                            balloonTimeout = setTimeout(() => {
-                                if (isBalloonOpen && !isMouseOverPlacemark && !isMouseOverBalloon && placemark && placemark.balloon) {
-                                    placemark.balloon.close();
-                                    isBalloonOpen = false;
-                                }
-                            }, 300);
-                        } catch (error) {
-                            console.error('Error in balloon mouseleave event:', error);
-                        }
-                    });
-                } catch (error) {
-                    console.error('Error setting up balloon events:', error);
-                }
-
+                
                 map.geoObjects.add(placemark);
             }
         });
+        
+        const balloonOpenHandler = () => {
+            const link = document.getElementById(`balloon-link-${selectedId}`);
+            if (link) {
+                link.onclick = (e) => {
+                    e.preventDefault();
+                    navigate(`/announcements/${selectedId}`);
+                };
+            }
+        }
 
-    }, [announcements, mapState, selectedId, onPlacemarkClick, ymaps, navigate]);
+        map.events.add('balloonopen', balloonOpenHandler);
 
-    return <div ref={mapRef} style={{ width: '100%', height: '100%' }} />;
+        return () => {
+             map.events.remove('balloonopen', balloonOpenHandler);
+        }
+
+    }, [announcements, selectedId, onPlacemarkClick, navigate, ymapsApi]);
+
+    if (!ymapsApi) {
+        return <div className={styles.loadingContainer}><div className={styles.loading}>Загрузка API Яндекс.Карт...</div></div>;
+    }
+
+    // Убираем класс из JSX, будем управлять им через JS
+    return <div ref={mapContainerRef} style={{ width: '100%', height: '100%' }} />;
 };
 
 export default YandexMap;
