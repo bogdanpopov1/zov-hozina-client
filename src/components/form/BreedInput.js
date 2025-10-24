@@ -35,7 +35,7 @@ const BreedInput = ({ value, onChange, categoryId }) => {
 
     const handleInputChange = (e) => {
         setInputValue(e.target.value);
-        onChange(e.target.value); // Сразу обновляем и в родительской форме
+        onChange(e.target.value);
     };
 
     const handleSuggestionClick = (breedName) => {

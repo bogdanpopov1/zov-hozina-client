@@ -1,10 +1,10 @@
 .mapPage {
     display: flex;
-    padding-top: 84px; /* Высота хедера */
+    padding-top: 84px;
     height: 100vh;
     background-color: var(--deep-blue);
     color: var(--light-gray);
-    box-sizing: border-box; /* Важно для правильного расчета высоты */
+    box-sizing: border-box;
 }
 
 .leftPanel {
@@ -19,16 +19,12 @@
     flex-shrink: 0;
 }
 
-/* --- КЛЮЧЕВОЕ ИСПРАВЛЕНИЕ --- */
 .rightPanel {
-    flex-grow: 1; /* Занимает оставшуюся ширину */
-    position: relative; /* Необходимо для позиционирования дочерних элементов */
+    flex-grow: 1;
+    position: relative;
     background-color: #1a1a1a;
-    /* Убираем display: flex, он здесь не нужен и мешает */
 }
 
-/* --- НОВЫЙ СТИЛЬ ДЛЯ КОНТЕЙНЕРА КАРТЫ --- */
-/* Этот стиль будет применен к div'у из YandexMap.js */
 .rightPanel > div {
     position: absolute;
     top: 0;
