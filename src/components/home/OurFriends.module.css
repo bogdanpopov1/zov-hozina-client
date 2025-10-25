@@ -1,7 +1,6 @@
 .friendsSection {
     width: 100%;
-    padding-bottom: 120px;
-    
+    padding-bottom: 5%;
 }
 
 .title {
@@ -28,7 +27,6 @@
 
 .logoCard {
     position: relative;
-    /* Необходимо для псевдоэлемента свечения */
     flex-shrink: 0;
     width: 250px;
     height: 150px;
@@ -40,10 +38,8 @@
     margin: 0 16px;
     transition: border-color 0.3s ease;
     overflow: hidden;
-    /* Чтобы свечение не выходило за пределы карточки */
 }
 
-/* Эффект свечения */
 .logoCard::before {
     content: '';
     position: absolute;
@@ -56,7 +52,6 @@
     opacity: 0;
     transition: opacity 0.4s ease, transform 0.4s ease;
     z-index: 1;
-    /* Под логотипом */
 }
 
 .logoCard:hover {
@@ -65,32 +60,25 @@
 
 .logoCard:hover::before {
     opacity: 0.2;
-    /* Интенсивность свечения */
     transform: translate(-50%, -50%) scale(1);
 }
 
 .logoCard img {
     position: relative;
-    /* Чтобы логотип был поверх свечения */
     z-index: 2;
     max-width: 70%;
-    /* Немного уменьшил, чтобы свечение было лучше видно */
     max-height: 70%;
     transition: transform 0.3s ease;
-    /* Плавное увеличение при наведении */
 }
 
 .logoCard:hover img {
     transform: scale(1.05);
-    /* Немного увеличиваем лого при наведении */
 }
 
-/* Анимация движения логотипов */
 @keyframes scroll {
     from {
         transform: translateX(0);
     }
-
     to {
         transform: translateX(-50%);
     }
@@ -99,5 +87,12 @@
 @media (max-width: 992px) {
     .title {
         text-align: center;
+    }
+}
+
+/* Эта строка гарантирует, что блок будет виден на мобильных */
+@media (max-width: 768px) {
+    .friendsSection {
+        display: block !important;
     }
 }

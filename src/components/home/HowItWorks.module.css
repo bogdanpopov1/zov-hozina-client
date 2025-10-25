@@ -1,65 +1,90 @@
 .howItWorksSection {
-  width: 100%;
+    width: 100%;
+    overflow: hidden; /* Важно для мобильного скролла */
 }
 
 .title {
-  font-size: 36px;
-  font-weight: 800;
-  color: var(--light-gray);
-  text-align: left;
-  margin-bottom: 40px;
+    font-size: 36px;
+    font-weight: 800;
+    color: var(--light-gray);
+    text-align: left;
+    margin-bottom: 40px;
 }
 
 .featuresGrid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 32px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 32px;
 }
 
 .featureCard {
-  background-color: var(--dark-slate);
-  border-radius: 20px;
-  padding: 40px;
-  text-align: center;
-  position: relative;
-  padding-top: 80px; /* Место для иконки */
-  margin-top: 80px;
+    background-color: var(--dark-slate);
+    border-radius: 20px;
+    padding: 30px;
+    text-align: center;
+    position: relative;
+    padding-top: 60px;
+    margin-top: 60px;
 }
 
 .iconContainer {
-  position: absolute;
-  top: 0;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 120px;
-  height: 120px;
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100px;
+    height: 100px;
 }
 
 .iconContainer img {
-  width: 100%;
-  height: 100%;
+    width: 100%;
+    height: 100%;
 }
 
 .featureCard h3 {
-  font-size: 24px;
-  font-weight: 700;
-  color: var(--light-gray);
-  margin-bottom: 16px;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--light-gray);
+    margin-bottom: 16px;
 }
 
 .featureCard p {
-  font-size: 18px;
-  color: var(--cool-gray);
-  line-height: 1.6;
+    font-size: 16px;
+    color: var(--cool-gray);
+    line-height: 1.6;
 }
 
-/* Адаптация */
 @media (max-width: 992px) {
-  .featuresGrid {
-    grid-template-columns: 1fr;
-    gap: 80px; /* Увеличиваем вертикальный отступ на мобильных */
-  }
-  .title {
-    text-align: center;
-  }
+    .title {
+        text-align: center;
+    }
+    .featuresGrid {
+        display: flex; /* Включаем Flexbox */
+        overflow-x: auto; /* Включаем горизонтальный скролл */
+        scroll-snap-type: x mandatory; /* Плавная доводка при скролле */
+        padding-bottom: 20px;
+        margin-bottom: -20px;
+        gap: 24px;
+        grid-template-columns: none; /* Отключаем Grid */
+    }
+    /* Стилизация скроллбара (опционально) */
+    .featuresGrid::-webkit-scrollbar {
+        height: 8px;
+    }
+    .featuresGrid::-webkit-scrollbar-thumb {
+        background: var(--dark-slate);
+        border-radius: 4px;
+    }
+    .featureCard {
+        flex: 0 0 80%; /* Каждая карточка занимает 80% ширины экрана */
+        scroll-snap-align: center; /* Центрируем карточку при скролле */
+        max-width: 320px;
+        font-size: 14px;
+    }
+    .featureCard h3 {
+        font-size: 20px;
+    }
+    .featureCard p {
+        font-size: 15px;
+    }
 }

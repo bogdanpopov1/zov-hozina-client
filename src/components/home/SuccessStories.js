@@ -1,18 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import styles from './SuccessStories.module.css';
-import illustration from '../../assets/stories/cat-illustration.svg';
-import { Star, Flame } from 'lucide-react';
+import { Star } from 'lucide-react';
 
-const StarRating = () => { // Убираем props, рейтинг больше не нужен
+const StarRating = () => {
     return (
         <div className={styles.starRating}>
             {[...Array(5)].map((_, index) => (
-                <Star
-                    key={index}
-                    size={18}
-                    className={styles.star} /* Используем один класс для всех звезд */
-                    fill="currentColor" /* Заливаем иконку цветом */
-                />
+                <Star key={index} className={styles.star} fill="var(--amber-yellow)" />
             ))}
         </div>
     );
@@ -21,26 +15,22 @@ const StarRating = () => { // Убираем props, рейтинг больше 
 const StoryCard = ({ story }) => {
     const avatarUrl = process.env.REACT_APP_API_URL + story.user_avatar_url;
     const petPhotoUrl = process.env.REACT_APP_API_URL + story.pet_photo_url;
-
     return (
         <div className={styles.storyCard}>
             <div className={styles.cardHeader}>
                 <img src={avatarUrl} alt={story.user_name} className={styles.avatar} />
                 <div className={styles.userInfo}>
                     <h4>{story.user_name}</h4>
-                    <StarRating /> {/* Вызываем без props */}
+                    <StarRating />
                 </div>
             </div>
             <p className={styles.storyText}>{story.story_text}</p>
             <div className={styles.petImageContainer}>
-                <img src={petPhotoUrl} alt="Найденный питомец" />
+                <img src={petPhotoUrl} alt="Фото найденного питомца" />
             </div>
             <div className={styles.cardFooter}>
-                <div className={styles.foundInfo}>
-                    <Flame size={16} />
-                    <span>{story.found_time_text}</span>
-                </div>
-                <span className={styles.date}>{story.found_date}</span>
+                <span className={styles.foundInfo}>{story.found_time_text}</span>
+                <span>{story.found_date}</span>
             </div>
         </div>
     );
@@ -68,13 +58,10 @@ const SuccessStories = () => {
     }, []);
 
     return (
-        <section className={styles.successStoriesSection}>
+        <div className={styles.successStoriesSection}>
             <div className={styles.titleContainer}>
-                <img src={illustration} alt="Cat" className={styles.illustration} />
                 <h2 className={styles.mainTitle}>Счастливые истории</h2>
-                <a href="/stories" className={styles.subtitle}>
-                    Больше радостных моментов &gt;
-                </a>
+                <a href="/stories" className={styles.subtitle}>Больше радостных моментов &gt;</a>
             </div>
             {loading && <p className={styles.stateMessage}>Загрузка историй...</p>}
             {error && <p className={styles.stateMessage}>Ошибка: {error}</p>}
@@ -85,7 +72,7 @@ const SuccessStories = () => {
                     ))}
                 </div>
             )}
-        </section>
+        </div>
     );
 };
 

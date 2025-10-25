@@ -1,20 +1,13 @@
 .successStoriesSection {
     width: 100%;
     position: relative;
+    padding-top: 2%;
 }
 
 .titleContainer {
     text-align: center;
     margin-bottom: 40px;
     position: relative;
-}
-
-.illustration {
-    position: absolute;
-    top: -180px;
-    left: 50%;
-    transform: translateX(-50%);
-    height: 180px;
 }
 
 .mainTitle {
@@ -25,14 +18,12 @@
 }
 
 .subtitle {
-    font-size: 20px;
+    font-size: 18px;
     font-weight: 500;
-    color: var(--deep-blue);
-    /* Темная ссылка */
-    opacity: 0.7;
+    color: var(--light-gray);
+    opacity: 0.8;
     transition: opacity 0.2s;
     display: inline-block;
-    /* Чтобы margin-top сработал */
     margin-top: 8px;
 }
 
@@ -42,14 +33,12 @@
 
 .storiesGrid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: 32px;
 }
 
-/* Стили карточки */
 .storyCard {
     background-color: var(--deep-blue);
-    /* ТЕМНО-СИНИЙ ФОН КАРТОЧКИ */
     border-radius: 20px;
     padding: 24px;
     display: flex;
@@ -59,26 +48,25 @@
 .cardHeader {
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: 12px;
     margin-bottom: 16px;
 }
 
 .avatar {
-    width: 50px;
-    height: 50px;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
 }
 
 .userInfo h4 {
-    font-size: 18px;
+    font-size: 16px;
     font-weight: 600;
     color: var(--light-gray);
     margin: 0 0 4px;
-    
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 280px;
+    max-width: 200px;
 }
 
 .starRating {
@@ -88,19 +76,17 @@
 
 .star {
     color: var(--amber-yellow);
+    width: 14px;
+    height: 14px;
 }
 
-/* Всегда закрашены */
-
 .storyText {
-    font-size: 18px;
+    font-size: 16px;
     color: var(--light-gray);
-    /* СВЕТЛЫЙ ЦВЕТ ТЕКСТА */
     line-height: 1.6;
     flex-grow: 1;
     margin-bottom: 24px;
-    opacity: 0.8;
-    /* Делаем текст чуть менее ярким, но светлым */
+    opacity: 0.9;
 }
 
 .petImageContainer {
@@ -143,25 +129,38 @@
     padding: 40px 0;
 }
 
-/* Адаптация */
-@media (max-width: 1700px) {
-    .storiesGrid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-}
-
 @media (max-width: 992px) {
-    .illustration {
-        display: none;
-    }
-
     .successStoriesSection {
-        padding-top: 0;
+        overflow-x: hidden;
+    }
+    .storiesGrid {
+        display: flex;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        padding-bottom: 20px;
+        margin: 0 -24px -20px;
+        padding-left: 24px;
+        padding-right: 24px;
+        gap: 24px;
+        grid-template-columns: none;
+    }
+    .storiesGrid::-webkit-scrollbar {
+        height: 8px;
+    }
+    .storiesGrid::-webkit-scrollbar-thumb {
+        background: var(--dark-slate);
+        border-radius: 4px;
+    }
+    .storyCard {
+        flex: 0 0 80%;
+        scroll-snap-align: center;
+        max-width: 320px;
     }
 }
 
 @media (max-width: 768px) {
-    .storiesGrid {
-        grid-template-columns: 1fr;
+    .successStoriesSection {
+        padding-top: 0;
+        margin-top: 60px;
     }
 }

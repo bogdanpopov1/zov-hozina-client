@@ -5,7 +5,7 @@ import VolunteerSubscriptions from '../components/profile/VolunteerSubscriptions
 import useDebounce from '../hooks/useDebounce';
 
 const ProfilePage = () => {
-    const { user, updateUser, updateVolunteerStatus } = useAuth();
+    const { user, updateUser, updateVolunteerStatus, logout } = useAuth();
     const [formData, setFormData] = useState({
         name: '',
         email: '',
@@ -41,17 +41,8 @@ const ProfilePage = () => {
             const options = {
                 method: "POST",
                 mode: "cors",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Accept": "application/json",
-                    "Authorization": "Token " + token
-                },
-                body: JSON.stringify({
-                    query: debouncedLocation,
-                    count: 5,
-                    from_bound: { "value": "city" },
-                    to_bound: { "value": "city" }
-                })
+                headers: { "Content-Type": "application/json", "Accept": "application/json", "Authorization": "Token " + token },
+                body: JSON.stringify({ query: debouncedLocation, count: 5, from_bound: { "value": "city" }, to_bound: { "value": "city" } })
             };
             fetch(url, options)
                 .then(response => response.json())
@@ -86,7 +77,6 @@ const ProfilePage = () => {
 
     const validateForm = () => {
         const errors = {};
-        // Российский номер: +7, 7, 8; с пробелами, скобками, дефисами или без
         const phoneRegex = /^(\+7|7|8)?[\s\-]?\(?[489][0-9]{2}\)?[\s\-]?[0-9]{3}[\s\-]?[0-9]{2}[\s\-]?[0-9]{2}$/;
         if (formData.phone && !phoneRegex.test(formData.phone)) {
             errors.phone = 'Введите корректный российский номер телефона.';
@@ -163,7 +153,10 @@ const ProfilePage = () => {
                                     <textarea id="bio" name="bio" rows="4" value={formData.bio} onChange={handleChange}></textarea>
                                 </div>
                             </div>
-                            <button type="submit" className={styles.submitButton}>Сохранить изменения</button>
+                            <div className={styles.formActions}>
+                                <button type="submit" className={styles.submitButton}>Сохранить изменения</button>
+                                <button type="button" onClick={logout} className={styles.logoutButton}>Выйти</button>
+                            </div>
                         </form>
 
                         <div className={styles.volunteerSection}>

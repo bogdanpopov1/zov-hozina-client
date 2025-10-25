@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom'; // <-- Импортируем
-import { useAnnouncement } from '../../context/AnnouncementContext'; // <-- Импортируем
+import { useNavigate } from 'react-router-dom';
+import { useAnnouncement } from '../../context/AnnouncementContext';
 import styles from './QuickAdForm.module.css';
-// ... (остальные импорты иконок)
 import { ReactComponent as SearchPawIcon } from '../../assets/icons/search-paw.svg';
 import { ReactComponent as DogIcon } from '../../assets/icons/dog.svg';
 import { ReactComponent as CatIcon } from '../../assets/icons/cat.svg';
@@ -13,31 +12,17 @@ import { ReactComponent as MaleIcon } from '../../assets/icons/male.svg';
 import { ReactComponent as FemaleIcon } from '../../assets/icons/female.svg';
 import { ReactComponent as UnknownIcon } from '../../assets/icons/unknown.svg';
 import { ReactComponent as MapPinIcon } from '../../assets/icons/map-pin.svg';
-import { ReactComponent as AutoDetectIcon } from '../../assets/icons/auto-detect.svg';
 import { VscClose } from 'react-icons/vsc';
-
-// ... (хук useDebounce остается без изменений)
-const useDebounce = (value, delay) => {
-    const [debouncedValue, setDebouncedValue] = useState(value);
-    useEffect(() => {
-        const handler = setTimeout(() => { setDebouncedValue(value); }, delay);
-        return () => { clearTimeout(handler); };
-    }, [value, delay]);
-    return debouncedValue;
-};
-
+import useDebounce from '../../hooks/useDebounce';
 
 const QuickAdForm = () => {
-    const navigate = useNavigate(); // <-- Инициализируем
-    const { updateQuickForm } = useAnnouncement(); // <-- Получаем функцию из контекста
-
+    const navigate = useNavigate();
+    const { updateQuickForm } = useAnnouncement();
     const [adType, setAdType] = useState('lost');
     const [petType, setPetType] = useState('dog');
     const [gender, setGender] = useState('male');
     const [locationInput, setLocationInput] = useState('');
-    const [selectedSuggestion, setSelectedSuggestion] = useState(null); // Для хранения координат
-    
-    // ... (остальные состояния без изменений)
+    const [selectedSuggestion, setSelectedSuggestion] = useState(null);
     const [otherPetInput, setOtherPetInput] = useState('');
     const [suggestions, setSuggestions] = useState([]);
     const [isSuggestionsVisible, setSuggestionsVisible] = useState(false);
@@ -68,7 +53,7 @@ const QuickAdForm = () => {
 
     const handleSuggestionClick = (suggestion) => {
         setLocationInput(suggestion.value);
-        setSelectedSuggestion(suggestion.data); // Сохраняем все данные, включая geo_lat, geo_lon
+        setSelectedSuggestion(suggestion.data);
         setSuggestionsVisible(false);
     };
 
@@ -88,64 +73,71 @@ const QuickAdForm = () => {
     const buttonClass = (groupState, value) => `${styles.button} ${groupState === value ? styles.active : ''}`;
 
     return (
-        <section className={styles.quickAdSection}>
-            <div className="container">
-                <h2 className={styles.sectionTitle}>Быстрое объявление</h2>
-                <div className={styles.formWrapper}>
-                    <div className={styles.iconHeader}><SearchPawIcon /></div>
-                    <div className={styles.formContainer}>
-                        <div className={styles.buttonGroup}>
-                            <button className={buttonClass(adType, 'lost')} onClick={() => setAdType('lost')}><HouseIcon /> Мой питомец потерялся</button>
-                            <button className={buttonClass(adType, 'found')} onClick={() => setAdType('found')}><SearchPawIcon /> Я нашел питомца</button>
-                        </div>
-                        <div className={styles.petTypeGroup}>
-                            <div className={styles.buttonGroup}>
-                                <button className={buttonClass(petType, 'dog')} onClick={() => setPetType('dog')}><DogIcon /> Собака</button>
-                                <button className={buttonClass(petType, 'cat')} onClick={() => setPetType('cat')}><CatIcon /> Кошка</button>
-                                <button className={buttonClass(petType, 'bird')} onClick={() => setPetType('bird')}><BirdIcon /> Птица</button>
-                                <button className={buttonClass(petType, 'other')} onClick={() => setPetType('other')}><SquirrelIcon /> Другое</button>
-                            </div>
-                            {petType === 'other' && (
-                                <div className={styles.inputWrapper}>
-                                    <input type="text" placeholder="Укажите вид" value={otherPetInput} onChange={(e) => setOtherPetInput(e.target.value)} />
-                                    {otherPetInput && <button className={styles.clearButton} onClick={() => setOtherPetInput('')}><VscClose /></button>}
-                                </div>
-                            )}
-                        </div>
-                        <div className={styles.buttonGroup}>
-                            <button className={buttonClass(gender, 'male')} onClick={() => setGender('male')}><MaleIcon /> Мальчик</button>
-                            <button className={buttonClass(gender, 'female')} onClick={() => setGender('female')}><FemaleIcon /> Девочка</button>
-                            <button className={buttonClass(gender, 'unknown')} onClick={() => setGender('unknown')}><UnknownIcon /> Не знаю</button>
-                        </div>
-                        <div className={styles.locationInputContainer}>
-                             <div className={styles.inputWrapperLocation}>
-                                <MapPinIcon />
+        <div className={styles.quickAdSection}>
+            <h2 className={styles.sectionTitle}>Быстрое объявление</h2>
+            <div className={styles.formWrapper}>
+                <div className={styles.iconHeader}><SearchPawIcon /></div>
+                <div className={styles.formContainer}>
+                    <div className={styles.buttonGroup}>
+                        <button onClick={() => setAdType('lost')} className={buttonClass(adType, 'lost')}>Мой питомец потерялся</button>
+                        <button onClick={() => setAdType('found')} className={buttonClass(adType, 'found')}>Я нашел питомца</button>
+                    </div>
+
+                    <div className={styles.petTypeGroup}>
+                         <div className={styles.buttonGroup}>
+                            <button onClick={() => setPetType('dog')} className={buttonClass(petType, 'dog')}><DogIcon /> Собака</button>
+                            <button onClick={() => setPetType('cat')} className={buttonClass(petType, 'cat')}><CatIcon /> Кошка</button>
+                            <button onClick={() => setPetType('bird')} className={buttonClass(petType, 'bird')}><BirdIcon /> Птица</button>
+                            <button onClick={() => setPetType('other')} className={buttonClass(petType, 'other')}><SquirrelIcon /> Другое</button>
+                         </div>
+                         {petType === 'other' && (
+                            <div className={styles.inputWrapper}>
+                                <HouseIcon />
                                 <input
                                     type="text"
-                                    placeholder="Где потерялся / нашелся?"
-                                    value={locationInput}
-                                    onChange={(e) => setLocationInput(e.target.value)}
-                                    onFocus={() => { if (suggestions.length > 0) setSuggestionsVisible(true); }}
+                                    placeholder="Введите название животного"
+                                    value={otherPetInput}
+                                    onChange={(e) => setOtherPetInput(e.target.value)}
                                 />
-                                {locationInput && <button className={styles.clearButton} onClick={() => setLocationInput('')}><VscClose /></button>}
+                                {otherPetInput && <button onClick={() => setOtherPetInput('')} className={styles.clearButton}><VscClose /></button>}
                             </div>
-                            {isSuggestionsVisible && suggestions.length > 0 && (
-                                <ul className={styles.suggestionsList}>
-                                    {suggestions.map((suggestion, index) => (
-                                        <li key={index} className={styles.suggestionItem} onClick={() => handleSuggestionClick(suggestion)}>
-                                            {suggestion.value}
-                                        </li>
-                                    ))}
-                                </ul>
-                            )}
-                        </div>
-                        <button className={styles.ctaButton} onClick={handleGoToDetails}>
-                            Перейти к деталям
-                        </button>
+                        )}
                     </div>
+                    
+                    <div className={styles.buttonGroup}>
+                        <button onClick={() => setGender('male')} className={buttonClass(gender, 'male')}><MaleIcon /> Мальчик</button>
+                        <button onClick={() => setGender('female')} className={buttonClass(gender, 'female')}><FemaleIcon /> Девочка</button>
+                        <button onClick={() => setGender('unknown')} className={buttonClass(gender, 'unknown')}><UnknownIcon /> Не знаю</button>
+                    </div>
+
+                    <div className={styles.locationRow}>
+                        <div className={styles.locationInputContainer}>
+                            <MapPinIcon />
+                            <input
+                                type="text"
+                                placeholder="Уточнить местоположение"
+                                value={locationInput}
+                                onChange={(e) => setLocationInput(e.target.value)}
+                                onFocus={() => { if (suggestions.length > 0) setSuggestionsVisible(true); }}
+                                onBlur={() => setTimeout(() => setSuggestionsVisible(false), 200)}
+                            />
+                            {locationInput && <button onClick={() => setLocationInput('')} className={styles.clearButton}><VscClose /></button>}
+                        </div>
+                        {isSuggestionsVisible && suggestions.length > 0 && (
+                            <ul className={styles.suggestionsList}>
+                                {suggestions.map((suggestion, index) => (
+                                    <li key={index} onMouseDown={() => handleSuggestionClick(suggestion)}>
+                                        {suggestion.value}
+                                    </li>
+                                ))}
+                            </ul>
+                        )}
+                    </div>
+
+                    <button onClick={handleGoToDetails} className={styles.ctaButton}>Перейти к деталям</button>
                 </div>
             </div>
-        </section>
+        </div>
     );
 };
 

@@ -8,10 +8,8 @@
     text-align: left;
     margin-bottom: 40px;
     color: var(--light-gray);
-    /* Темный заголовок на светлом фоне родителя */
 }
 
-/* Сетка для карточек */
 .grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -24,11 +22,13 @@
     padding: 20px;
     display: flex;
     flex-direction: column;
-    transition: transform 0.2s ease-in-out;
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    cursor: pointer;
 }
 
 .card:hover {
     transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
 }
 
 .imageContainer {
@@ -53,18 +53,17 @@
     display: flex;
     justify-content: space-between;
     color: var(--cool-gray);
-    margin-bottom: 16px;
+    margin-bottom: 12px;
 }
 
 .infoItem {
     display: flex;
     align-items: center;
     gap: 8px;
-    font-size: 16px;
+    font-size: 14px;
     font-weight: 500;
 }
 
-/* --- Основной текстовый контент --- */
 .cardContent {
     display: flex;
     flex-direction: column;
@@ -72,7 +71,7 @@
 }
 
 .title {
-    font-size: 24px;
+    font-size: 20px;
     font-weight: 700;
     color: var(--light-gray);
     line-height: 1.4;
@@ -81,18 +80,19 @@
     display: -webkit-box;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 2;
+    margin-bottom: 16px; /* Добавляем отступ после заголовка */
 }
 
+/* Новые стили для строки с датой */
 .updateInfo {
     display: flex;
     align-items: center;
     gap: 8px;
-    font-size: 16px;
+    font-size: 14px;
     color: var(--cool-gray);
-    margin: 16px 0;
+    margin-bottom: 16px; /* Отступ перед кнопкой */
 }
 
-/* --- Желтая кнопка "Начать поиск" --- */
 .searchButton {
     background-color: var(--amber-yellow);
     color: var(--light-gray);
@@ -101,20 +101,19 @@
     width: 100%;
     border-radius: 8px;
     font-weight: 600;
-    font-size: 20px;
+    font-size: 18px;
     cursor: pointer;
     transition: all 0.2s ease-in-out;
     margin-top: auto;
 }
 
 .searchButton:hover {
-    background-color: var(--light-yellow);
+    filter: brightness(1.1);
 }
-
 
 .actions {
     text-align: center;
-    margin-top: 80px;
+    margin-top: 40px;
 }
 
 .showMoreButton {
@@ -122,7 +121,7 @@
     color: var(--light-gray);
     padding: 18px 40px;
     border-radius: 8px;
-    font-size: 20px;
+    font-size: 18px;
     font-weight: 600;
     cursor: pointer;
     transition: background-color 0.2s;
@@ -139,21 +138,23 @@
     font-size: 18px;
 }
 
-
-/* Планшеты и ноутбуки */
-@media (max-width: 1700px) {
-    .grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
+@media (max-width: 992px) {
+    .sectionTitle { text-align: center; }
 }
 
-/* Мобильные устройства */
 @media (max-width: 768px) {
     .grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
     }
-
-    .sectionTitle {
-        font-size: 28px;
+    .card {
+        padding: 12px;
+    }
+    .title {
+        font-size: 16px;
+    }
+    .searchButton {
+        font-size: 16px;
+        padding: 12px;
     }
 }
