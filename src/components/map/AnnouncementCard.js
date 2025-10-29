@@ -1,22 +1,12 @@
 import React from 'react';
 import { MapPin, Clock, Palette, User } from 'lucide-react';
 import styles from './AnnouncementCard.module.css';
-import placeholderImage from '../../assets/stories/cat-illustration.svg';
 
 const AnnouncementCard = ({ announcement, onClick, isSelected }) => {
     const getStatusTag = (announcement) => {
-        if (announcement.status === 'archived') {
-            return { text: 'В архиве', className: styles.archivedTag };
-        }
-        if (announcement.is_featured) {
-            return { text: 'Срочный поиск', className: styles.urgentTag };
-        }
+        if (announcement.status === 'archived') { return { text: 'В архиве', className: styles.archivedTag }; }
+        if (announcement.is_featured) { return { text: 'Срочный поиск', className: styles.urgentTag }; }
         return { text: 'В поиске', className: styles.defaultTag };
-    };
-
-    const getOwnerInfo = (user) => {
-        if (!user) return 'Владелец: Неизвестно';
-        return `Владелец: ${user.name}`;
     };
 
     const formatTimeAgo = (dateString) => {
@@ -29,7 +19,7 @@ const AnnouncementCard = ({ announcement, onClick, isSelected }) => {
     };
 
     const statusTag = getStatusTag(announcement);
-    const imageUrl = announcement.photos?.[0]?.url || placeholderImage;
+    const imageUrl = announcement.photos?.[0]?.url || '/images/mock/story-cat1.png';
     const cardClasses = `${styles.card} ${isSelected ? styles.selectedCard : ''}`;
 
     return (
@@ -42,26 +32,15 @@ const AnnouncementCard = ({ announcement, onClick, isSelected }) => {
                     </span>
                 )}
             </div>
+
             <div className={styles.content}>
-                <h3 className={styles.title}>Пропал(а) {announcement.pet_breed}, кличка "{announcement.pet_name}"</h3>
+                <h4 className={styles.title}>Пропал(а) {announcement.pet_breed}, кличка "{announcement.pet_name}"</h4>
                 <p className={styles.description}>{announcement.description}</p>
                 <div className={styles.metaGrid}>
-                    <div className={styles.metaItem}>
-                        <MapPin className={styles.icon} />
-                        <span>{announcement.location_address}</span>
-                    </div>
-                    <div className={styles.metaItem}>
-                        <Clock className={styles.icon} />
-                        <span>{formatTimeAgo(announcement.created_at)}</span>
-                    </div>
-                    <div className={styles.metaItem}>
-                        <Palette className={styles.icon} />
-                        <span>{announcement.color}</span>
-                    </div>
-                    <div className={styles.metaItem}>
-                        <User className={styles.icon} />
-                        <span>{getOwnerInfo(announcement.user)}</span>
-                    </div>
+                    <div className={styles.metaItem}><MapPin className={styles.icon} /> <span>{announcement.location_address}</span></div>
+                    <div className={styles.metaItem}><Clock className={styles.icon} /> <span>{formatTimeAgo(announcement.created_at)}</span></div>
+                    <div className={`${styles.metaItem} ${styles.desktopOnly}`}><Palette className={styles.icon} /> <span>{announcement.color}</span></div>
+                    <div className={`${styles.metaItem} ${styles.desktopOnly}`}><User className={styles.icon} /> <span>{announcement.user?.name || 'Неизвестно'}</span></div>
                 </div>
             </div>
         </div>

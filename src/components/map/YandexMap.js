@@ -20,9 +20,7 @@ const YandexMap = ({ announcements, mapState, selectedId, onPlacemarkClick, onBa
     }, []);
 
     useEffect(() => {
-        if (!ymapsApi || !mapContainerRef.current) {
-            return;
-        }
+        if (!ymapsApi || !mapContainerRef.current) { return; }
         if (!mapInstanceRef.current) {
             const map = new ymapsApi.Map(mapContainerRef.current, {
                 center: mapState.center.slice().reverse(),
@@ -32,15 +30,9 @@ const YandexMap = ({ announcements, mapState, selectedId, onPlacemarkClick, onBa
             });
 
             const typeSelector = new ymapsApi.control.Button({
-                data: {
-                    content: 'Спутник'
-                },
-                options: {
-                    selectOnClick: false,
-                    maxWidth: 150
-                }
+                data: { content: 'Спутник' },
+                options: { selectOnClick: false, maxWidth: 150 }
             });
-
             typeSelector.events.add('click', () => {
                 const mapContainer = mapContainerRef.current;
                 if (map.getType() === 'yandex#map') {
@@ -53,28 +45,19 @@ const YandexMap = ({ announcements, mapState, selectedId, onPlacemarkClick, onBa
                     mapContainer.classList.add('dark-mode');
                 }
             });
-
-            map.controls.add(typeSelector, { float: 'right' });
+            // ИЗМЕНЕНО: Используем position для корректного размещения в левом нижнем углу
+            map.controls.add(typeSelector, { position: { top: '65px', left: '10px' } });
             mapInstanceRef.current = map;
             mapContainerRef.current.classList.add('dark-mode');
         }
 
         const map = mapInstanceRef.current;
-        const handleBalloonClose = () => {
-            if (onBalloonClose) {
-                onBalloonClose();
-            }
-        };
+        const handleBalloonClose = () => { if (onBalloonClose) { onBalloonClose(); } };
         map.events.add('balloonclose', handleBalloonClose);
 
         return () => {
-            if (map) {
-                map.events.remove('balloonclose', handleBalloonClose);
-            }
-            if (mapInstanceRef.current) {
-                mapInstanceRef.current.destroy();
-                mapInstanceRef.current = null;
-            }
+            if (map) { map.events.remove('balloonclose', handleBalloonClose); }
+            if (mapInstanceRef.current) { mapInstanceRef.current.destroy(); mapInstanceRef.current = null; }
         };
     }, [ymapsApi, onBalloonClose]);
 
@@ -87,31 +70,21 @@ const YandexMap = ({ announcements, mapState, selectedId, onPlacemarkClick, onBa
     useEffect(() => {
         const map = mapInstanceRef.current;
         if (!map) return;
-
         map.geoObjects.removeAll();
         map.balloon.close();
 
         announcements.forEach(ad => {
             if (ad.latitude && ad.longitude) {
                 const isSelected = selectedId === ad.announcement_id;
-                const placemark = new ymapsApi.Placemark(
-                    [ad.latitude, ad.longitude],
-                    {},
-                    {
-                        preset: isSelected ? 'islands#yellowIcon' : 'islands#blueIcon'
-                    }
-                );
-
+                const placemark = new ymapsApi.Placemark([ad.latitude, ad.longitude], {}, {
+                    preset: isSelected ? 'islands#yellowIcon' : 'islands#blueIcon'
+                });
                 placemark.events.add('click', () => onPlacemarkClick(ad));
-
                 if (isSelected) {
                     const prefix = ad.gender === 'female' ? 'Пропала' : 'Пропал';
                     map.balloon.open(placemark.geometry.getCoordinates(), {
                         contentHeader: `${prefix} ${ad.pet_breed}, "${ad.pet_name}"`,
-                        contentBody: `
-                            <p>${ad.description || ''}</p>
-                            <a style="color: #2AABEE; text-decoration: none;" href="/announcements/${selectedId}" id="balloon-link-${selectedId}">Подробнее...</a>
-                        `,
+                        contentBody: `<p>${ad.description || ''}</p><a href="/announcements/${selectedId}" id="balloon-link-${selectedId}">Подробнее...</a>`,
                         contentFooter: `Информация обновлена ${new Date(ad.updated_at).toLocaleDateString()}`
                     });
                 }
@@ -119,7 +92,7 @@ const YandexMap = ({ announcements, mapState, selectedId, onPlacemarkClick, onBa
             }
         });
 
-        const balloonOpenHandler = () => {
+        const balloonOpenHandler = (e) => {
             const link = document.getElementById(`balloon-link-${selectedId}`);
             if (link) {
                 link.onclick = (e) => {
@@ -127,21 +100,15 @@ const YandexMap = ({ announcements, mapState, selectedId, onPlacemarkClick, onBa
                     navigate(`/announcements/${selectedId}`);
                 };
             }
-        }
+        };
 
         map.events.add('balloonopen', balloonOpenHandler);
-
         return () => {
-            map.events.remove('balloonopen', balloonOpenHandler);
-        }
-
+            if(map) map.events.remove('balloonopen', balloonOpenHandler);
+        };
     }, [announcements, selectedId, onPlacemarkClick, navigate, ymapsApi]);
 
-
-    if (!ymapsApi) {
-        return <div className={styles.loadingContainer}><div className={styles.loading}>Загрузка API Яндекс.Карт...</div></div>;
-    }
-
+    if (!ymapsApi) { return <div>Загрузка API Яндекс.Карт...</div>; }
     return <div ref={mapContainerRef} style={{ width: '100%', height: '100%' }}></div>;
 };
 

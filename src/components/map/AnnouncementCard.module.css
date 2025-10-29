@@ -1,127 +1,32 @@
-/* НОВЫЕ СТИЛИ ДЛЯ ГОРИЗОНТАЛЬНОЙ КАРТОЧКИ */
-.card {
-    display: flex;
-    gap: 20px;
-    padding: 20px;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-    border-bottom: 1px solid var(--dark-slate);
+.card { display: flex; gap: 20px; padding: 20px; cursor: pointer; transition: background-color 0.2s ease; border-bottom: 1px solid var(--dark-slate); }
+.card:hover { background-color: var(--dark-slate); }
+.selectedCard { background-color: var(--dark-slate); border-left: 3px solid var(--amber-yellow); padding-left: 17px; }
+.imageContainer { width: 200px; flex-shrink: 0; position: relative; border-radius: 8px; overflow: hidden; }
+.petImage { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; }
+.statusTag { position: absolute; bottom: 8px; left: 8px; padding: 4px 8px; border-radius: 6px; font-size: 12px; font-weight: 700; }
+.urgentTag { background-color: var(--red); color: white; }
+.archivedTag { background-color: var(--cool-gray); color: var(--deep-blue); }
+.defaultTag { background-color: var(--amber-yellow); color: white; }
+.content { flex-grow: 1; display: flex; flex-direction: column; min-width: 0; }
+.title { font-size: 18px; font-weight: 700; color: var(--light-gray); margin: 0 0 8px 0; }
+.description { font-size: 14px; color: var(--cool-gray); margin: 0 0 12px 0; line-height: 1.5; flex-grow: 1; }
+.metaGrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: auto; }
+.metaItem { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--cool-gray); overflow: hidden; }
+.icon { width: 14px; height: 14px; flex-shrink: 0; color: var(--cool-gray); }
+.metaItem span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+.desktopOnly { display: flex; }
+
+@media (max-width: 1024px) {
+    .card { gap: 16px; padding: 16px; align-items: flex-start; }
+    .imageContainer { width: 120px; height: 90px; }
+    .title { font-size: 16px; margin-bottom: 6px; }
+    .description { display: block; font-size: 13px; margin-bottom: 10px; }
+    .desktopOnly { display: none; }
+    .metaGrid { grid-template-columns: 1fr; gap: 6px; }
+    .statusTag { font-size: 11px; padding: 3px 6px; }
 }
 
-.card:hover {
-    background-color: var(--dark-slate);
-}
-
-.selectedCard {
-    background-color: var(--dark-slate);
-    border-left: 3px solid var(--amber-yellow);
-    padding-left: 17px;
-}
-
-.imageContainer {
-    width: 200px;
-    height: 140px;
-    flex-shrink: 0;
-    position: relative;
-    border-radius: 8px;
-    overflow: hidden;
-}
-
-.petImage {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.statusTag {
-    position: absolute;
-    bottom: 8px;
-    left: 8px;
-    padding: 4px 8px;
-    border-radius: 4px;
-    font-size: 12px;
-    font-weight: 600;
-    color: white;
-}
-
-.urgentTag {
-    background-color: var(--red);
-}
-
-.archivedTag {
-    background-color: var(--cool-gray);
-    color: var(--deep-blue);
-}
-
-.defaultTag {
-    background-color: var(--amber-yellow);
-    color: var(--deep-blue);
-}
-
-.content {
-    flex-grow: 1;
-    display: flex;
-    flex-direction: column;
-}
-
-.title {
-    font-size: 18px;
-    font-weight: 700;
-    color: var(--light-gray);
-    margin: 0 0 8px 0;
-}
-
-.description {
-    font-size: 14px;
-    color: var(--cool-gray);
-    margin: 0 0 12px 0;
-    line-height: 1.5;
-    flex-grow: 1; /* Заставляет мета-информацию прижаться к низу */
-}
-
-.metaGrid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
-    margin-top: auto; /* Прижимает блок к низу */
-}
-
-.metaItem {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 13px;
-    color: var(--cool-gray);
-}
-
-.icon {
-    width: 14px;
-    height: 14px;
-    flex-shrink: 0;
-    color: var(--cool-gray);
-}
-
-.metaItem span {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-/* Responsive design */
-@media (max-width: 768px) {
-    .card {
-        padding: 12px;
-    }
-    .imageContainer {
-        height: 160px;
-    }
-    .title {
-        font-size: 15px;
-    }
-    .description {
-        font-size: 13px;
-    }
-    .metaItem {
-        font-size: 12px;
-    }
+@media (max-width: 550px) {
+    .imageContainer { width: 140px; height: 110px; }
 }

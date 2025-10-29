@@ -27,7 +27,7 @@
 .centerNav {
     display: flex;
     align-items: center;
-    gap: 36px;
+    gap: 24px;
     flex-grow: 1;
     justify-content: center;
 }
@@ -71,7 +71,7 @@
     position: absolute;
     top: 100%;
     left: -20px;
-    background-color: rgba(96, 96, 96, 0.192);
+    background-color: rgba(45, 55, 72, 0.8);
     backdrop-filter: blur(10px);
     border-radius: 12px;
     padding: 8px;
@@ -86,15 +86,8 @@
 }
 
 @keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(-10px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 .dropdownMenu a {
@@ -224,102 +217,122 @@
     padding: 0;
 }
 
-.mobileMenu {
-    display: none;
-}
+.mobileMenu { display: none; }
 
 @media (max-width: 1200px) {
     .centerNav {
         justify-content: center;
-        /* Центрируем navLinks */
         flex-grow: 10;
-        /* Даем больше приоритета, чтобы занять место */
     }
-
     .navLinks {
         flex-grow: 0;
-        /* Убираем растягивание у самих ссылок */
     }
-
     .searchBar {
         display: none;
     }
-
-    .ctaButton {
+    .desktopActions .ctaButton {
         display: none;
     }
 }
 
 @media (max-width: 992px) {
-    .headerContainer {
-        padding: 16px 24px;
-    }
-
+    .headerContainer { padding: 16px 24px; }
     .centerNav,
     .desktopActions {
         display: none;
     }
-
-    .mobileMenuToggle {
-        display: block;
-    }
-
-    .logo img {
-        height: 40px;
-    }
-
+    .mobileMenuToggle { display: block; }
+    .logo img { height: 40px; }
     .mobileMenu {
+        display: flex; flex-direction: column; position: fixed; top: 0; left: 0;
+        width: 100%; height: 100vh; height: 100dvh; background-color: var(--deep-blue);
+        z-index: 101; padding: 16px 24px 40px; overflow-y: auto;
+    }
+    .mobileMenuHeader {
         display: flex;
-        flex-direction: column;
-        position: fixed;
-        top: 0;
-        left: 0;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+    }
+    .mobileSearch {
+        position: relative;
+        margin-bottom: 24px;
+    }
+    .mobileSearch input {
         width: 100%;
-        height: 100vh;
-        height: 100dvh;
-        background-color: var(--deep-blue);
-        z-index: 101;
-        padding: 100px 24px 40px;
-        overflow-y: auto;
+        background-color: var(--dark-slate);
+        border: 1px solid var(--cool-gray);
+        border-radius: 8px;
+        padding: 14px 16px 14px 48px;
+        color: var(--light-gray);
+        font-size: 16px;
     }
-
     .mobileNavLinks {
-        display: flex;
-        flex-direction: column;
-        gap: 16px;
-        font-size: 24px;
-        font-weight: 600;
+        display: flex; flex-direction: column; gap: 12px;
     }
-
-    .mobileNavLinks>a {
+    .mobileNavLinks > a {
         padding: 12px 0;
         color: var(--light-gray);
+        font-size: 20px;
+        font-weight: 600;
     }
-
     .mobileDropdown summary {
         padding: 12px 0;
         cursor: pointer;
+        font-size: 20px;
+        font-weight: 700;
+        color: var(--light-gray);
+        list-style: none;
+        position: relative;
+        padding-left: 24px;
     }
-
+    .mobileDropdown summary::-webkit-details-marker { display: none; }
+    .mobileDropdown summary::before {
+        content: '>';
+        position: absolute;
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%) rotate(0deg);
+        font-size: 24px;
+        color: var(--light-gray);
+        transition: transform 0.2s ease-in-out;
+    }
+    .mobileDropdown[open] > summary::before {
+        transform: translateY(-50%) rotate(90deg);
+    }
+    .mobileDropdownContent {
+        padding-top: 8px;
+    }
     .mobileDropdown a {
         padding: 10px 0 10px 24px;
         font-size: 18px;
         font-weight: 400;
         display: block;
-        color: var(--light-gray);
-        opacity: 0.8;
+        color: var(--cool-gray);
     }
-
+    .mobileDropdown a:hover {
+        color: var(--amber-yellow);
+    }
     .mobileActions {
         margin-top: auto;
-        padding-top: 32px;
+        padding-top: 24px;
         border-top: 1px solid var(--dark-slate);
         display: flex;
         flex-direction: column;
         gap: 16px;
     }
-
-    .mobileActions .loginButton,
+    .mobileActions .loginButton {
+        width: 100%;
+        text-align: center;
+        font-size: 18px;
+        padding: 16px;
+        background: none;
+        color: var(--cool-gray);
+        font-weight: 600;
+    }
+    .mobileActions .loginButton:hover {
+        color: var(--light-gray);
+    }
     .mobileActions .ctaButton {
         width: 100%;
         text-align: center;
@@ -329,11 +342,6 @@
 }
 
 @media (max-width: 480px) {
-    .headerContainer {
-        padding: 12px 16px;
-    }
-
-    .logo img {
-        height: 36px;
-    }
+    .headerContainer { padding: 12px 16px; }
+    .logo img { height: 36px; }
 }

@@ -133,16 +133,38 @@ const Header = () => {
 
                 {isMobileMenuOpen && (
                     <div className={styles.mobileMenu}>
+                        <div className={styles.mobileMenuHeader}>
+                            <Link to="/" className={styles.logo} onClick={closeMobileMenu}>
+                                <img src={logo} alt="Зов Хозяина" />
+                            </Link>
+                            <button className={styles.mobileMenuToggle} onClick={closeMobileMenu}><X /></button>
+                        </div>
+                        <div className={styles.mobileSearch}>
+                            <Search className={styles.searchIcon} size={20} />
+                             <input
+                                type="text"
+                                placeholder="Поиск..."
+                                value={searchValue}
+                                onChange={(e) => setSearchValue(e.target.value)}
+                            />
+                            {searchValue && (
+                                <button onClick={() => setSearchValue('')} className={styles.clearButton}><X size={18} /></button>
+                            )}
+                        </div>
                         <nav className={styles.mobileNavLinks}>
                              <Link to="/" onClick={closeMobileMenu}>Главная</Link>
                              <Link to="/map" onClick={closeMobileMenu}>Карта поисков</Link>
                              <details className={styles.mobileDropdown}>
                                 <summary>Владельцам</summary>
-                                {ownerLinks.map(link => <Link key={link.path} to={link.path} onClick={closeMobileMenu}>{link.label}</Link>)}
+                                <div className={styles.mobileDropdownContent}>
+                                    {ownerLinks.map(link => <Link key={link.path} to={link.path} onClick={closeMobileMenu}>{link.label}</Link>)}
+                                </div>
                              </details>
                              <details className={styles.mobileDropdown}>
                                 <summary>Волонтерам</summary>
-                                {volunteerLinks.map(link => <Link key={link.path} to={link.path} onClick={closeMobileMenu}>{link.label}</Link>)}
+                                <div className={styles.mobileDropdownContent}>
+                                    {volunteerLinks.map(link => <Link key={link.path} to={link.path} onClick={closeMobileMenu}>{link.label}</Link>)}
+                                </div>
                              </details>
                         </nav>
                         <div className={styles.mobileActions}>

@@ -4,6 +4,7 @@ import YandexMap from '../components/map/YandexMap';
 import FilterPanel from '../components/map/FilterPanel';
 import styles from './MapPage.module.css';
 import api from '../api/axiosConfig';
+import { ChevronDown } from 'lucide-react';
 
 const defaultFilters = {
     location: '',
@@ -17,19 +18,23 @@ const defaultFilters = {
     longitude: null,
 };
 
+const PANEL_STATES = {
+    HIDDEN: 'hidden',
+    PEEKING: 'peeking',
+    EXPANDED: 'expanded',
+};
+
 const MapPage = () => {
     const [announcements, setAnnouncements] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [selectedId, setSelectedId] = useState(null);
-    const [mapState, setMapState] = useState({
-        center: [49.106414, 55.796127],
-        zoom: 12,
-    });
+    const [mapState, setMapState] = useState({ center: [49.106414, 55.796127], zoom: 12 });
     const [totalCount, setTotalCount] = useState(0);
     const [activeTab, setActiveTab] = useState('announcements');
     const [filters, setFilters] = useState(defaultFilters);
     const [sortBy, setSortBy] = useState('default');
+    const [panelState, setPanelState] = useState(PANEL_STATES.PEEKING);
     const listRef = useRef(null);
 
     const fetchAnnouncements = useCallback(async (currentFilters, currentSortBy) => {
@@ -40,15 +45,12 @@ const MapPage = () => {
             const apiFilters = { ...currentFilters };
             delete apiFilters.latitude;
             delete apiFilters.longitude;
-
             Object.entries(apiFilters).forEach(([key, value]) => {
                 if (value || (key === 'actual' && value === false)) {
-                     params.append(key, value.toString());
+                    params.append(key, value.toString());
                 }
             });
-            
             params.append('sort_by', currentSortBy);
-
             const response = await api.get(`/api/announcements`, { params });
             const responseData = response.data;
             const announcementsArray = responseData.data || responseData;
@@ -90,10 +92,7 @@ const MapPage = () => {
         setFilters(newFilters);
         setActiveTab('announcements');
         if (newFilters.latitude && newFilters.longitude) {
-            setMapState({
-                center: [parseFloat(newFilters.longitude), parseFloat(newFilters.latitude)],
-                zoom: 12 
-            });
+            setMapState({ center: [parseFloat(newFilters.longitude), parseFloat(newFilters.latitude)], zoom: 12 });
         }
     };
 
@@ -106,29 +105,25 @@ const MapPage = () => {
         setSortBy(e.target.value);
     };
 
+    const handlePanelToggle = () => {
+        setPanelState(prev => (prev === PANEL_STATES.EXPANDED ? PANEL_STATES.PEEKING : PANEL_STATES.EXPANDED));
+    };
+
+    const showPanel = () => {
+        if (panelState === PANEL_STATES.HIDDEN) {
+            setPanelState(PANEL_STATES.PEEKING);
+        }
+    };
+
     const renderContent = () => {
         if (activeTab === 'filters') {
-            return (
-                <FilterPanel
-                    initialFilters={filters}
-                    onApply={handleApplyFilters}
-                    onReset={handleResetFilters}
-                />
-            );
+            return <FilterPanel initialFilters={filters} onApply={handleApplyFilters} onReset={handleResetFilters} />;
         }
-
-        if (loading) {
-            return <div className={styles.statusMessage}>Загрузка объявлений...</div>;
-        }
-        if (error) {
-            return <div className={styles.statusMessage}>Ошибка загрузки: {error.message}</div>;
-        }
-        if (announcements.length === 0) {
-            return <div className={styles.statusMessage}>Объявления не найдены. Попробуйте изменить фильтры.</div>;
-        }
-
+        if (loading) { return <div className={styles.statusMessage}>Загрузка объявлений...</div>; }
+        if (error) { return <div className={`${styles.statusMessage} ${styles.error}`}>Ошибка загрузки: {error.message}</div>; }
+        if (announcements.length === 0) { return <div className={styles.statusMessage}>Объявления не найдены. Попробуйте изменить фильтры.</div>; }
         return (
-             <div ref={listRef} className={styles.announcementsList}>
+            <div className={styles.announcementsList} ref={listRef}>
                 {announcements.map((announcement) => (
                     <div key={announcement.announcement_id} data-id={announcement.announcement_id}>
                         <AnnouncementCard
@@ -142,28 +137,23 @@ const MapPage = () => {
         );
     };
 
+    const pageClasses = `${styles.mapPage} ${styles[panelState]}`;
+
     return (
-        <div className={styles.mapPage}>
+        <div className={pageClasses}>
             <div className={styles.leftPanel}>
+                <div className={styles.panelHandle} onClick={handlePanelToggle}>
+                    <div className={styles.handleBar}></div>
+                </div>
                 <div className={styles.panelHeader}>
                     <div className={styles.tabs}>
-                        <button
-                            className={`${styles.tab} ${activeTab === 'announcements' ? styles.active : ''}`}
-                            onClick={() => setActiveTab('announcements')}
-                        >
-                            Объявления
-                        </button>
-                        <button
-                             className={`${styles.tab} ${activeTab === 'filters' ? styles.active : ''}`}
-                             onClick={() => setActiveTab('filters')}
-                        >
-                            Фильтры
-                        </button>
+                        <button className={`${styles.tab} ${activeTab === 'announcements' ? styles.active : ''}`} onClick={() => setActiveTab('announcements')}>Объявления</button>
+                        <button className={`${styles.tab} ${activeTab === 'filters' ? styles.active : ''}`} onClick={() => setActiveTab('filters')}>Фильтры</button>
                     </div>
                     {activeTab === 'announcements' && (
                         <div className={styles.headerInfo}>
                             <span className={styles.count}>Найдено {totalCount} объявлений</span>
-                            <select value={sortBy} onChange={handleSortChange} className={styles.sortDropdown}>
+                            <select className={styles.sortDropdown} value={sortBy} onChange={handleSortChange}>
                                 <option value="default">По умолчанию</option>
                                 <option value="newest">Сначала новые</option>
                                 <option value="oldest">Сначала старые</option>
@@ -173,7 +163,7 @@ const MapPage = () => {
                 </div>
                 {renderContent()}
             </div>
-            <div className={styles.rightPanel}>
+            <div className={styles.rightPanel} onClick={showPanel}>
                 <YandexMap
                     announcements={announcements}
                     mapState={mapState}
@@ -181,6 +171,9 @@ const MapPage = () => {
                     onPlacemarkClick={handleSelection}
                     onBalloonClose={handleBalloonClose}
                 />
+                <button className={styles.hidePanelButton} onClick={(e) => { e.stopPropagation(); setPanelState(PANEL_STATES.HIDDEN); }}>
+                    <ChevronDown />
+                </button>
             </div>
         </div>
     );
