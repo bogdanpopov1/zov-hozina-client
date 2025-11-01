@@ -1,0 +1,78 @@
+.pageContainer {
+    padding: 120px 20px 60px;
+    background-color: var(--deep-blue);
+    min-height: 100vh;
+    color: var(--light-gray);
+}
+
+.contentWrapper {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.contentWrapper h1 {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.announcementsList {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.announcementItem {
+    background-color: var(--dark-slate);
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+/* Убираем нижнюю границу у карточки, так как теперь есть фон */
+.announcementItem > div {
+    border-bottom: none !important;
+}
+
+.statusContainer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 80vh;
+}
+
+.statusMessage {
+    font-size: 24px;
+    color: var(--cool-gray);
+}
+
+.emptyState {
+    text-align: center;
+    padding: 60px 20px;
+    background-color: var(--dark-slate);
+    border-radius: 12px;
+}
+
+.emptyState p {
+    font-size: 18px;
+    color: var(--cool-gray);
+    margin-bottom: 24px;
+}
+
+.actions {
+    text-align: center;
+    margin-top: 40px;
+}
+
+.createButton {
+    display: inline-block;
+    padding: 14px 28px;
+    border-radius: 8px;
+    background-color: var(--amber-yellow);
+    color: var(--light-gray);
+    font-weight: 700;
+    font-size: 16px;
+    transition: filter 0.2s;
+}
+
+.createButton:hover {
+    filter: brightness(1.1);
+}

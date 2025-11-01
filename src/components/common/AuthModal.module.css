@@ -1,0 +1,104 @@
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal {
+    background-color: var(--dark-slate);
+    padding: 40px;
+    border-radius: 16px;
+    width: 100%;
+    max-width: 400px;
+    position: relative;
+    color: var(--light-gray);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+}
+
+.closeButton {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: none;
+    border: none;
+    color: var(--cool-gray);
+    cursor: pointer;
+}
+
+.modal h2 {
+    text-align: center;
+    margin-bottom: 24px;
+}
+
+.modal form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.modal input {
+    padding: 12px 16px;
+    border-radius: 8px;
+    border: 1px solid var(--cool-gray);
+    background-color: var(--deep-blue);
+    color: var(--light-gray);
+    font-size: 16px;
+}
+
+.submitButton {
+    padding: 14px;
+    border-radius: 8px;
+    border: none;
+    background-color: var(--amber-yellow);
+    color: var(--light-gray);
+    font-weight: 700;
+    font-size: 16px;
+    cursor: pointer;
+    margin-top: 8px;
+}
+
+.separator {
+    text-align: center;
+    color: var(--cool-gray);
+    margin: 20px 0;
+}
+
+.telegramButton {
+    width: 100%;
+    padding: 14px;
+    border-radius: 8px;
+    border: 1px solid #2AABEE;
+    background-color: transparent;
+    color: #2AABEE;
+    font-weight: 600;
+    cursor: pointer;
+    /* Добавьте стили для иконки, если будете использовать */
+}
+
+.toggleForm {
+    text-align: center;
+    margin-top: 24px;
+    color: var(--cool-gray);
+}
+
+.toggleForm button {
+    background: none;
+    border: none;
+    color: var(--amber-yellow);
+    font-weight: 600;
+    cursor: pointer;
+    margin-left: 8px;
+}
+
+.error {
+    color: var(--red);
+    text-align: center;
+    font-size: 14px;
+}

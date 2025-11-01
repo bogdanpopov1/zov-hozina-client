@@ -1,163 +1,200 @@
-/* --- Стили Hero-секции и ее содержимого (остаются без изменений) --- */
 .heroSection {
-  position: relative;
-  width: 100%;
-  height: 100vh;
-  background-image: url('../assets/hero-background.jpg');
-  background-size: cover;
-  background-position: center;
-  display: flex;
-  align-items: center;
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    min-height: 650px;
+    background-image: url('../assets/hero-background.jpg');
+    background-size: cover;
+    background-position: center 30%;
+    display: flex;
+    align-items: center;
+    color: var(--light-gray);
+}
+
+.heroSection::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0.6) 0%, transparent 70%);
 }
 
 .content {
-  position: relative;
-  z-index: 1;
-  width: 100%;
-  padding-left: 1000px;
-  text-align: left;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 24px;
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 1920px;
+    margin: 0 auto;
+    padding: 0 40px;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+    margin-left: calc((100% - 1920px) / 2 + 1920px * 0.3);
 }
 
 .content h1 {
-  font-size: 48px;
-  font-weight: 800;
-  color: var(--light-gray);
+    font-size: clamp(2.5rem, 5vw, 3.5rem);
+    font-weight: 600;
+    line-height: 1.2;
 }
 
 .content p {
-  font-size: 28px;
-  color: var(--light-gray);
+    font-size: clamp(1.1rem, 2vw, 1.5rem);
+    max-width: 500px;
 }
 
 .buttonGroup {
-  display: flex;
-  gap: 16px;
-  margin-top: 16px;
+    display: flex;
+    gap: 16px;
+    margin-top: 24px;
 }
 
 .ctaButton,
 .secondaryButton {
-  font-family: 'Manrope', sans-serif;
-  font-weight: 600;
-  font-size: 20px;
-  padding: 20px 40px;
-  border-radius: 8px;
-  border: 1px solid transparent;
-  cursor: pointer;
-  transition: all 0.2s ease-in-out;
+    font-family: 'Manrope', sans-serif;
+    font-weight: 600;
+    font-size: clamp(1rem, 1.5vw, 1.25rem);
+    padding: 20px 40px;
+    border-radius: 8px;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    white-space: nowrap;
 }
 
 .ctaButton {
-  background-color: var(--amber-yellow);
-  color: var(--light-gray);
+    background-color: var(--amber-yellow);
+    color: var(--light-gray);
 }
 
 .ctaButton:hover {
-  background-color: var(--light-yellow);
+    filter: brightness(1.1);
 }
 
 .secondaryButton {
-  background-color: transparent;
-  color: var(--light-gray);
-  border-color: var(--light-gray);
+    background-color: transparent;
+    color: var(--light-gray);
+    border-color: var(--light-gray);
 }
 
 .secondaryButton:hover {
-  background-color: var(--light-gray);
-  color: var(--deep-blue);
+    background-color: var(--light-gray);
+    color: var(--deep-blue);
 }
 
-
-/* --- Основной контейнер для контента на ТЕМНОМ фоне --- */
-.container {
-  max-width: 1660px;
-  margin: 0 auto;
-  padding: 0 20px;
-  margin-top: 80px;
-  margin-bottom: 80px;
-
-  /* ДОБАВЛЕННЫЕ СТРОКИ ДЛЯ ОСТУПОВ: */
-  display: flex;
-  flex-direction: column;
-  gap: 120px;
+/* --- Контейнеры для контента --- */
+.mainContent {
+    background-color: var(--deep-blue);
 }
 
-/* --- Отдельная секция со СВЕТЛО-СЕРЫМ фоном --- */
+.container,
+.darkContainer {
+    max-width: 1920px;
+    margin: 0 auto;
+    padding: 80px 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 120px;
+}
+
 .lightGraySection {
-  width: 100%;
-  background-color: var(--cool-gray);
-  /* Вот они, правильные отступы внутри секции */
-  padding: 60px 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+    width: 100%;
+    background-color: var(--cool-gray);
+}
+
+/* --- Стили для секции с историями --- */
+.storiesSectionWrapper {
+    position: relative; /* Создаем контекст позиционирования */
+}
+
+.sectionIllustration {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    height: 180px;
+    z-index: 1;
 }
 
 
 /* --- Адаптация --- */
-@media (max-width: 1700px) {
-  .container {
-    max-width: 1200px;
-  }
+@media (max-width: 1960px) {
+    .content {
+        margin-left: 40%;
+    }
 
-  .content {
-    padding-left: 500px;
-  }
+    .content h1 {
+        font-size: clamp(2.5rem, 5vw, 3rem);
+    }
 }
 
-@media (max-width: 1200px) {
-  .heroSection {
-    height: 80vh;
-  }
+@media (max-width: 1540px) {
+    .heroSection {
+        background-position: 10% 0%;
+    }
 
-  .content {
-    padding: 0 64px;
-    align-items: center;
-    text-align: center;
-  }
-
-  .container {
-    max-width: 992px;
-  }
+    .content h1 {
+        font-size: clamp(2.5rem, 5vw, 2.5rem);
+    }
 }
 
 @media (max-width: 992px) {
-  .container {
-    margin-top: 60px;
-    margin-bottom: 60px;
-    padding: 0 40px;
-  }
+    .content {
+        width: 100%;
+        margin-left: 0;
+        padding: 0 40px;
+        align-items: center;
+        text-align: center;
+    }
 
-  .lightGraySection {
-    padding: 60px 0;
-  }
+    .container,
+    .darkContainer {
+        padding: 60px 40px;
+        gap: 80px;
+    }
 }
 
 @media (max-width: 768px) {
-  .heroSection {
-    height: 70vh;
-  }
+    .heroSection {
+        height: 80vh;
+        min-height: 600px;
+    }
 
-  .content {
-    padding: 0 24px;
-  }
+    .content {
+        padding: 0 24px;
+    }
 
-  .buttonGroup {
-    flex-direction: column;
-    width: 100%;
-  }
+    .content h1 {
+        font-size: 2.5rem;
+    }
 
-  .container {
-    margin-top: 40px;
-    margin-bottom: 40px;
-    padding: 0 20px;
-  }
+    .content p {
+        font-size: 1.2rem;
+    }
 
-  .lightGraySection {
-    padding: 40px 0;
-  }
+    .buttonGroup {
+        flex-direction: column;
+        width: 100%;
+        max-width: 350px;
+    }
+
+    .ctaButton,
+    .secondaryButton {
+        font-size: 1.2rem;
+        padding: 18px 32px;
+    }
+
+    .container,
+    .darkContainer {
+        padding: 40px 24px;
+        gap: 60px;
+    }
+    
+    .sectionIllustration {
+        display: none; /* Скрываем на мобильных, так как там нет нужного эффекта */
+    }
 }

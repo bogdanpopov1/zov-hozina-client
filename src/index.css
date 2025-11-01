@@ -3,7 +3,7 @@
 :root {
   --deep-blue: #1A2536;
   --dark-slate: #2D3748;
-  --amber-yellow: #EBB000;
+  --amber-yellow: rgb(212, 162, 0);
   --light-yellow: #e3d5a5;
   --light-gray: #F5F7FA;
   --cool-gray: #8494A8;
@@ -112,4 +112,22 @@ html, body {
   a {
     font-size: 14px;
   }
+}
+
+
+
+
+
+
+/* --- СТИЛИ ДЛЯ ТЕМНОЙ КАРТЫ YANDEX API v2.1 --- */
+/* Применяем фильтры, только когда у контейнера есть класс .dark-mode */
+.dark-mode {
+    filter: invert(1) hue-rotate(180deg) brightness(1.25) contrast(0.9);
+}
+
+/* Отменяем фильтр для элементов управления и балунов, чтобы они выглядели нормально */
+.dark-mode .ymaps-2-1-79-controls__control,
+.dark-mode .ymaps-2-1-79-balloon,
+.dark-mode .ymaps-2-1-79-hint {
+    filter: invert(1) hue-rotate(180deg) brightness(2) contrast(0.9);
 }

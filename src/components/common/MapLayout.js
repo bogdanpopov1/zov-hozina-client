@@ -1,18 +1,17 @@
 import React from 'react';
 import { Outlet } from 'react-router-dom';
 import Header from './Header';
-import Footer from './Footer';
 
-const Layout = () => {
+const MapLayout = () => {
     return (
         <div className="layout">
             <Header />
-            <main style={{ minHeight: 'calc(100vh - 200px)' }}> {}
+            <main> {}
                 <Outlet />
             </main>
-            <Footer />
+            {}
         </div>
     );
 };
 
-export default Layout;
+export default MapLayout;
