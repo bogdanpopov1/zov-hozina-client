@@ -30,6 +30,10 @@
     height: 100%;
 }
 
+.active {
+    background-color: var(--deep-blue);
+}
+
 .formContainer {
     background-color: var(--dark-slate);
     border-radius: 16px;
@@ -74,9 +78,7 @@
     height: 32px;
 }
 
-.active {
-    background-color: var(--deep-blue); /* #1A2536 */
-}
+
 
 .petTypeGroup {
     width: 100%;

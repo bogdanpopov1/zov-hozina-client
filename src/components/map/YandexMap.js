@@ -45,7 +45,6 @@ const YandexMap = ({ announcements, mapState, selectedId, onPlacemarkClick, onBa
                     mapContainer.classList.add('dark-mode');
                 }
             });
-            // ИЗМЕНЕНО: Используем position для корректного размещения в левом нижнем углу
             map.controls.add(typeSelector, { position: { top: '65px', left: '10px' } });
             mapInstanceRef.current = map;
             mapContainerRef.current.classList.add('dark-mode');
