@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Link, NavLink, useNavigate } from 'react-router-dom';
+import { Link, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import styles from './Header.module.css';
 import logo from '../../assets/logo.svg';
 import api from '../../api/axiosConfig';
 import { CgProfile } from 'react-icons/cg';
-import { ChevronDown, Menu, X, Search, Bell } from 'lucide-react';
+import { ChevronDown, Menu, X, Search, Bell, MapPin } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import AuthModal from './AuthModal';
+import useDebounce from '../../hooks/useDebounce';
 
 const ownerLinks = [
     { path: '/create-announcement', label: 'Создать объявление' },
@@ -23,8 +24,65 @@ const volunteerLinks = [
     { path: '/rating', label: 'Рейтинг волонтеров' },
 ];
 
+const NotificationBell = React.memo(({ notifications, isNotificationOpen, onToggle, onItemClick, isMobile }) => (
+    <div className={styles.notificationContainer}>
+        <button onClick={onToggle} className={`${styles.notificationButton} ${isMobile ? styles.mobileNotificationButton : ''}`}>
+            <Bell />
+            {notifications.length > 0 && <span className={styles.notificationIndicator}></span>}
+        </button>
+        {isNotificationOpen && (
+            <div className={styles.notificationDropdown}>
+                {notifications.length > 0 ? (
+                    notifications.map(n => (
+                        <div
+                            key={n.log_id}
+                            className={styles.notificationItem}
+                            onMouseDown={() => onItemClick(n.log_id, n.announcement_id)}
+                        >
+                            <span className={styles.userName}>{n.user.name}</span> оставил запись в журнале по объявлению <span className={styles.petName}>"{n.announcement.pet_name}"</span>
+                        </div>
+                    ))
+                ) : (
+                    <div className={styles.noNotifications}>Новых уведомлений нет</div>
+                )}
+            </div>
+        )}
+    </div>
+));
+
+const SearchBar = React.memo(({ searchValue, onSearchChange, onKeyDown, onClear, suggestions, isVisible, onSuggestionClick, isMobile }) => (
+    <div className={isMobile ? styles.mobileSearch : styles.searchBar}>
+        <Search className={styles.searchIcon} size={20} />
+        <input
+            type="text"
+            placeholder={isMobile ? "Поиск..." : "Поиск по адресу, кличке, породе"}
+            value={searchValue}
+            onChange={onSearchChange}
+            onKeyDown={onKeyDown}
+            onFocus={onSearchChange}
+        />
+        {searchValue && (
+            <button onClick={onClear} className={styles.clearButton}><X size={18} /></button>
+        )}
+        {isVisible && suggestions.length > 0 && (
+            <div className={styles.suggestionsDropdown}>
+                {suggestions.map(ad => (
+                    <div key={ad.announcement_id} className={styles.suggestionItem} onMouseDown={() => onSuggestionClick(ad.announcement_id)}>
+                        <img src={ad.photos?.[0]?.url || '/images/mock/story-cat1.png'} alt={ad.pet_name} className={styles.suggestionImage} />
+                        <div className={styles.suggestionInfo}>
+                            <span className={styles.suggestionTitle}>Пропал(а) {ad.pet_breed}, "{ad.pet_name}"</span>
+                            <span className={styles.suggestionLocation}><MapPin size={12} /> {ad.location_address}</span>
+                        </div>
+                    </div>
+                ))}
+            </div>
+        )}
+    </div>
+));
+
 const Header = () => {
     const navigate = useNavigate();
+    const location = useLocation();
     const [isOwnerMenuOpen, setOwnerMenuOpen] = useState(false);
     const [isVolunteerMenuOpen, setVolunteerMenuOpen] = useState(false);
     const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -36,6 +94,35 @@ const Header = () => {
     const [notifications, setNotifications] = useState([]);
     const [isNotificationOpen, setNotificationOpen] = useState(false);
     const notificationRef = useRef(null);
+    const searchRef = useRef(null);
+
+    const [suggestions, setSuggestions] = useState([]);
+    const [isSuggestionsVisible, setSuggestionsVisible] = useState(false);
+    const debouncedSearchValue = useDebounce(searchValue, 300);
+
+    useEffect(() => {
+        const params = new URLSearchParams(location.search);
+        const searchQuery = params.get('search') || '';
+        setSearchValue(searchQuery);
+    }, [location.search]);
+
+    useEffect(() => {
+        if (debouncedSearchValue.length > 2) {
+            const fetchSuggestions = async () => {
+                try {
+                    const response = await api.get(`/api/announcements/search-suggestion?search=${debouncedSearchValue}`);
+                    setSuggestions(response.data);
+                    setSuggestionsVisible(true);
+                } catch (error) {
+                    console.error("Failed to fetch suggestions", error);
+                }
+            };
+            fetchSuggestions();
+        } else {
+            setSuggestions([]);
+            setSuggestionsVisible(false);
+        }
+    }, [debouncedSearchValue]);
 
     useEffect(() => {
         if (user) {
@@ -56,12 +143,28 @@ const Header = () => {
             if (notificationRef.current && !notificationRef.current.contains(event.target)) {
                 setNotificationOpen(false);
             }
+            if (searchRef.current && !searchRef.current.contains(event.target)) {
+                setSuggestionsVisible(false);
+            }
         };
         document.addEventListener('mousedown', handleClickOutside);
         return () => {
             document.removeEventListener('mousedown', handleClickOutside);
         };
     }, []);
+
+    const handleSearchKeyDown = (e) => {
+        if (e.key === 'Enter') {
+            navigate(`/map?search=${encodeURIComponent(searchValue)}`);
+            setSuggestionsVisible(false);
+        }
+    };
+
+    const handleSuggestionClick = (announcementId) => {
+        navigate(`/announcements/${announcementId}`);
+        setSearchValue('');
+        setSuggestionsVisible(false);
+    };
 
     const handleNotificationItemClick = async (logId, announcementId) => {
         navigate(`/announcements/${announcementId}`);
@@ -108,32 +211,6 @@ const Header = () => {
         closeMobileMenu();
     };
 
-    const NotificationBell = ({ isMobile = false }) => (
-        <div className={styles.notificationContainer} ref={notificationRef}>
-            <button onClick={() => setNotificationOpen(prev => !prev)} className={`${styles.notificationButton} ${isMobile ? styles.mobileNotificationButton : ''}`}>
-                <Bell />
-                {notifications.length > 0 && <span className={styles.notificationIndicator}></span>}
-            </button>
-            {isNotificationOpen && (
-                <div className={styles.notificationDropdown}>
-                    {notifications.length > 0 ? (
-                        notifications.map(n => (
-                            <div
-                                key={n.log_id}
-                                className={styles.notificationItem}
-                                onMouseDown={() => handleNotificationItemClick(n.log_id, n.announcement_id)}
-                            >
-                                <span className={styles.userName}>{n.user.name}</span> оставил запись в журнале по объявлению <span className={styles.petName}>"{n.announcement.pet_name}"</span>
-                            </div>
-                        ))
-                    ) : (
-                        <div className={styles.noNotifications}>Новых уведомлений нет</div>
-                    )}
-                </div>
-            )}
-        </div>
-    );
-
     return (
         <>
             <header className={styles.header}>
@@ -166,25 +243,32 @@ const Header = () => {
                                 Карта поисков
                             </NavLink>
                         </nav>
-                        <div className={styles.searchBar}>
-                            <Search className={styles.searchIcon} size={20} />
-                            <input
-                                type="text"
-                                placeholder="Поиск по адресу, кличке, породе"
-                                value={searchValue}
-                                onChange={(e) => setSearchValue(e.target.value)}
+                        <div ref={searchRef}>
+                            <SearchBar
+                                searchValue={searchValue}
+                                onSearchChange={(e) => setSearchValue(e.target.value)}
+                                onKeyDown={handleSearchKeyDown}
+                                onClear={() => setSearchValue('')}
+                                suggestions={suggestions}
+                                isVisible={isSuggestionsVisible}
+                                onSuggestionClick={handleSuggestionClick}
+                                isMobile={false}
                             />
-                            {searchValue && (
-                                <button onClick={() => setSearchValue('')} className={styles.clearButton}><X size={18} /></button>
-                            )}
                         </div>
                     </div>
 
                     <div className={styles.desktopActions}>
                         {user ? (
                             <>
-                                <button onClick={() => navigate('/create-announcement')} className={styles.ctaButton}>Создать объявление</button>
-                                <NotificationBell />
+                                <div ref={notificationRef}>
+                                    <NotificationBell
+                                        notifications={notifications}
+                                        isNotificationOpen={isNotificationOpen}
+                                        onToggle={() => setNotificationOpen(prev => !prev)}
+                                        onItemClick={handleNotificationItemClick}
+                                        isMobile={false}
+                                    />
+                                </div>
                                 <Link to="/profile" className={styles.profileIcon}><CgProfile /></Link>
                             </>
                         ) : (
@@ -196,7 +280,17 @@ const Header = () => {
                     </div>
 
                     <div className={styles.mobileHeaderActions}>
-                        {user && <NotificationBell isMobile={true} />}
+                        {user &&
+                            <div ref={notificationRef}>
+                                <NotificationBell
+                                    notifications={notifications}
+                                    isNotificationOpen={isNotificationOpen}
+                                    onToggle={() => setNotificationOpen(prev => !prev)}
+                                    onItemClick={handleNotificationItemClick}
+                                    isMobile={true}
+                                />
+                            </div>
+                        }
                         <button className={styles.mobileMenuToggle} onClick={() => setMobileMenuOpen(!isMobileMenuOpen)}>
                             {isMobileMenuOpen ? <X /> : <Menu />}
                         </button>
@@ -211,12 +305,17 @@ const Header = () => {
                             </Link>
                             <button className={styles.mobileMenuToggle} onClick={closeMobileMenu}><X /></button>
                         </div>
-                        <div className={styles.mobileSearch}>
-                            <Search className={styles.searchIcon} size={20} />
-                            <input type="text" placeholder="Поиск..." value={searchValue} onChange={(e) => setSearchValue(e.target.value)} />
-                            {searchValue && (
-                                <button onClick={() => setSearchValue('')} className={styles.clearButton}><X size={18} /></button>
-                            )}
+                        <div ref={searchRef}>
+                            <SearchBar
+                                searchValue={searchValue}
+                                onSearchChange={(e) => setSearchValue(e.target.value)}
+                                onKeyDown={handleSearchKeyDown}
+                                onClear={() => setSearchValue('')}
+                                suggestions={suggestions}
+                                isVisible={isSuggestionsVisible}
+                                onSuggestionClick={handleSuggestionClick}
+                                isMobile={true}
+                            />
                         </div>
                         <nav className={styles.mobileNavLinks}>
                             <Link to="/" onClick={closeMobileMenu}>Главная</Link>
