@@ -13,6 +13,7 @@ import { ReactComponent as FemaleIcon } from '../../assets/icons/female.svg';
 import { ReactComponent as UnknownIcon } from '../../assets/icons/unknown.svg';
 import { ReactComponent as MapPinIcon } from '../../assets/icons/map-pin.svg';
 import { VscClose } from 'react-icons/vsc';
+import { LocateFixed, Loader2 } from 'lucide-react';
 import useDebounce from '../../hooks/useDebounce';
 
 const QuickAdForm = () => {
@@ -26,6 +27,7 @@ const QuickAdForm = () => {
     const [otherPetInput, setOtherPetInput] = useState('');
     const [suggestions, setSuggestions] = useState([]);
     const [isSuggestionsVisible, setSuggestionsVisible] = useState(false);
+    const [isDetecting, setIsDetecting] = useState(false);
     const debouncedLocationInput = useDebounce(locationInput, 500);
 
     useEffect(() => {
@@ -35,8 +37,17 @@ const QuickAdForm = () => {
             const options = {
                 method: "POST",
                 mode: "cors",
-                headers: { "Content-Type": "application/json", "Accept": "application/json", "Authorization": "Token " + token },
-                body: JSON.stringify({ query: debouncedLocationInput, count: 5, "from_bound": { "value": "city" }, "to_bound": { "value": "house" } })
+                headers: {
+                    "Content-Type": "application/json",
+                    "Accept": "application/json",
+                    "Authorization": "Token " + token
+                },
+                body: JSON.stringify({
+                    query: debouncedLocationInput,
+                    count: 5,
+                    "from_bound": { "value": "city" },
+                    "to_bound": { "value": "house" }
+                })
             };
             fetch(url, options)
                 .then(response => response.json())
@@ -55,6 +66,53 @@ const QuickAdForm = () => {
         setLocationInput(suggestion.value);
         setSelectedSuggestion(suggestion.data);
         setSuggestionsVisible(false);
+    };
+
+    const handleAutoDetect = () => {
+        if (!navigator.geolocation) {
+            alert('Ваш браузер не поддерживает геолокацию.');
+            return;
+        }
+        setIsDetecting(true);
+        navigator.geolocation.getCurrentPosition(
+            async (position) => {
+                const { latitude, longitude } = position.coords;
+                const url = "https://suggestions.dadata.ru/suggestions/api/4_1/rs/geolocate/address";
+                const token = process.env.REACT_APP_DADATA_API_KEY;
+                const options = {
+                    method: "POST",
+                    mode: "cors",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Accept": "application/json",
+                        "Authorization": "Token " + token
+                    },
+                    body: JSON.stringify({ lat: latitude, lon: longitude, count: 1 })
+                };
+                try {
+                    const response = await fetch(url, options);
+                    const result = await response.json();
+                    if (result.suggestions && result.suggestions.length > 0) {
+                        const suggestion = result.suggestions[0];
+                        setLocationInput(suggestion.value);
+                        setSelectedSuggestion(suggestion.data);
+                    }
+                } catch (error) {
+                    console.error("Ошибка обратного геокодирования DaData:", error);
+                    alert('Не удалось определить адрес по координатам.');
+                } finally {
+                    setIsDetecting(false);
+                }
+            },
+            (error) => {
+                setIsDetecting(false);
+                if (error.code === error.PERMISSION_DENIED) {
+                    alert('Вы запретили доступ к геолокации. Пожалуйста, разрешите доступ в настройках браузера.');
+                } else {
+                    alert('Не удалось определить ваше местоположение.');
+                }
+            }
+        );
     };
 
     const handleGoToDetails = () => {
@@ -82,34 +140,26 @@ const QuickAdForm = () => {
                         <button onClick={() => setAdType('lost')} className={buttonClass(adType, 'lost')}>Мой питомец потерялся</button>
                         <button onClick={() => setAdType('found')} className={buttonClass(adType, 'found')}>Я нашел питомца</button>
                     </div>
-
                     <div className={styles.petTypeGroup}>
-                         <div className={styles.buttonGroup}>
+                        <div className={styles.buttonGroup}>
                             <button onClick={() => setPetType('dog')} className={buttonClass(petType, 'dog')}><DogIcon /> Собака</button>
                             <button onClick={() => setPetType('cat')} className={buttonClass(petType, 'cat')}><CatIcon /> Кошка</button>
                             <button onClick={() => setPetType('bird')} className={buttonClass(petType, 'bird')}><BirdIcon /> Птица</button>
                             <button onClick={() => setPetType('other')} className={buttonClass(petType, 'other')}><SquirrelIcon /> Другое</button>
-                         </div>
-                         {petType === 'other' && (
+                        </div>
+                        {petType === 'other' && (
                             <div className={styles.inputWrapper}>
                                 <HouseIcon />
-                                <input
-                                    type="text"
-                                    placeholder="Введите название животного"
-                                    value={otherPetInput}
-                                    onChange={(e) => setOtherPetInput(e.target.value)}
-                                />
+                                <input type="text" placeholder="Введите название животного" value={otherPetInput} onChange={(e) => setOtherPetInput(e.target.value)} />
                                 {otherPetInput && <button onClick={() => setOtherPetInput('')} className={styles.clearButton}><VscClose /></button>}
                             </div>
                         )}
                     </div>
-                    
                     <div className={styles.buttonGroup}>
                         <button onClick={() => setGender('male')} className={buttonClass(gender, 'male')}><MaleIcon /> Мальчик</button>
                         <button onClick={() => setGender('female')} className={buttonClass(gender, 'female')}><FemaleIcon /> Девочка</button>
                         <button onClick={() => setGender('unknown')} className={buttonClass(gender, 'unknown')}><UnknownIcon /> Не знаю</button>
                     </div>
-
                     <div className={styles.locationRow}>
                         <div className={styles.locationInputContainer}>
                             <MapPinIcon />
@@ -122,6 +172,9 @@ const QuickAdForm = () => {
                                 onBlur={() => setTimeout(() => setSuggestionsVisible(false), 200)}
                             />
                             {locationInput && <button onClick={() => setLocationInput('')} className={styles.clearButton}><VscClose /></button>}
+                            <button type="button" onClick={handleAutoDetect} className={styles.detectButton} disabled={isDetecting}>
+                                {isDetecting ? <Loader2 className={styles.spinner} size={20} /> : <LocateFixed size={20} />}
+                            </button>
                         </div>
                         {isSuggestionsVisible && suggestions.length > 0 && (
                             <ul className={styles.suggestionsList}>
@@ -133,7 +186,6 @@ const QuickAdForm = () => {
                             </ul>
                         )}
                     </div>
-
                     <button onClick={handleGoToDetails} className={styles.ctaButton}>Перейти к деталям</button>
                 </div>
             </div>

@@ -1,160 +1,155 @@
 .urgentSearchSection {
-    width: 100%;
+width: 100%;
 }
-
 .sectionTitle {
-    font-size: 36px;
-    font-weight: 800;
-    text-align: left;
-    margin-bottom: 40px;
-    color: var(--light-gray);
+font-size: 36px;
+font-weight: 800;
+text-align: left;
+margin-bottom: 40px;
+color: var(--light-gray);
 }
-
 .grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 32px;
+display: grid;
+grid-template-columns: repeat(4, 1fr);
+gap: 32px;
 }
-
 .card {
-    background-color: var(--deep-blue);
-    border-radius: 16px;
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-    cursor: pointer;
+background-color: var(--deep-blue);
+border-radius: 16px;
+padding: 20px;
+display: flex;
+flex-direction: column;
+transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+cursor: pointer;
 }
-
 .card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+transform: translateY(-5px);
+box-shadow: 0 10px 20px rgba(0,0,0,0.2);
 }
-
 .imageContainer {
-    width: 100%;
-    padding-top: 100%;
-    position: relative;
-    border-radius: 12px;
-    overflow: hidden;
-    margin-bottom: 16px;
+width: 100%;
+padding-top: 100%;
+position: relative;
+border-radius: 12px;
+overflow: hidden;
+margin-bottom: 16px;
+background-color: var(--dark-slate);
 }
-
 .imageContainer img {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+position: absolute;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+object-fit: cover;
 }
-
+.defaultPetImage {
+object-fit: cover !important;
+}
 .infoBar {
-    display: flex;
-    justify-content: space-between;
-    color: var(--cool-gray);
-    margin-bottom: 12px;
+display: flex;
+justify-content: space-between;
+color: var(--cool-gray);
+margin-bottom: 12px;
 }
-
 .infoItem {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 14px;
-    font-weight: 500;
+display: flex;
+align-items: center;
+gap: 8px;
+font-size: 14px;
+font-weight: 500;
 }
-
 .cardContent {
-    display: flex;
-    flex-direction: column;
-    flex-grow: 1;
+display: flex;
+flex-direction: column;
+flex-grow: 1;
 }
-
 .title {
-    font-size: 20px;
-    font-weight: 700;
-    color: var(--light-gray);
-    line-height: 1.4;
-    flex-grow: 1;
-    overflow: hidden;
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 2;
-    margin-bottom: 16px; /* Добавляем отступ после заголовка */
+font-size: 20px;
+font-weight: 700;
+color: var(--light-gray);
+line-height: 1.4;
+flex-grow: 1;
+overflow: hidden;
+display: -webkit-box;
+-webkit-box-orient: vertical;
+-webkit-line-clamp: 2;
+margin-bottom: 16px;
 }
-
-/* Новые стили для строки с датой */
 .updateInfo {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 14px;
-    color: var(--cool-gray);
-    margin-bottom: 16px; /* Отступ перед кнопкой */
+display: flex;
+align-items: center;
+gap: 8px;
+font-size: 14px;
+color: var(--cool-gray);
+margin-bottom: 16px;
 }
-
 .searchButton {
-    background-color: var(--amber-yellow);
-    color: var(--light-gray);
-    border: none;
-    padding: 16px;
-    width: 100%;
-    border-radius: 8px;
-    font-weight: 600;
-    font-size: 18px;
-    cursor: pointer;
-    transition: all 0.2s ease-in-out;
-    margin-top: auto;
+background-color: var(--amber-yellow);
+color: var(--light-gray);
+border: none;
+padding: 16px;
+width: 100%;
+border-radius: 8px;
+font-weight: 600;
+font-size: 18px;
+cursor: pointer;
+transition: all 0.2s ease-in-out;
+margin-top: auto;
 }
-
 .searchButton:hover {
-    filter: brightness(1.1);
+filter: brightness(1.1);
 }
-
 .actions {
-    text-align: center;
-    margin-top: 40px;
+text-align: center;
+margin-top: 40px;
 }
-
 .showMoreButton {
-    background-color: var(--deep-blue);
-    color: var(--light-gray);
-    padding: 18px 40px;
-    border-radius: 8px;
-    font-size: 18px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background-color 0.2s;
+background-color: var(--deep-blue);
+color: var(--light-gray);
+padding: 18px 40px;
+border-radius: 8px;
+font-size: 18px;
+font-weight: 600;
+cursor: pointer;
+transition: background-color 0.2s;
 }
-
 .showMoreButton:hover {
-    background-color: #3e4a5f;
+background-color: #3e4a5f;
 }
-
 .stateMessage {
-    color: var(--deep-blue);
-    text-align: center;
-    padding: 40px;
-    font-size: 18px;
+color: var(--deep-blue);
+text-align: center;
+padding: 40px;
+font-size: 18px;
 }
-
 @media (max-width: 992px) {
-    .sectionTitle { text-align: center; }
+.sectionTitle {
+text-align: center;
 }
-
+}
 @media (max-width: 768px) {
-    .grid {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 16px;
-    }
-    .card {
-        padding: 12px;
-    }
-    .title {
-        font-size: 16px;
-    }
-    .searchButton {
-        font-size: 16px;
-        padding: 12px;
-    }
+.sectionTitle {
+font-size: 26px;
+}
+.grid {
+grid-template-columns: repeat(2, 1fr);
+gap: 16px;
+}
+.card {
+padding: 12px;
+}
+.infoItem, .updateInfo {
+font-size: 12px;
+}
+.title {
+font-size: 16px;
+}
+.searchButton {
+font-size: 16px;
+padding: 12px;
+}
+.showMoreButton {
+font-size: 16px;
+}
 }

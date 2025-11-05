@@ -1,0 +1,94 @@
+.overlay {
+position: fixed;
+top: 0;
+left: 0;
+right: 0;
+bottom: 0;
+background-color: rgba(0, 0, 0, 0.7);
+display: flex;
+justify-content: center;
+align-items: center;
+z-index: 1000;
+}
+.modal {
+background-color: var(--dark-slate);
+padding: 40px;
+border-radius: 16px;
+width: 100%;
+max-width: 450px;
+position: relative;
+color: var(--light-gray);
+box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+}
+.closeButton {
+position: absolute;
+top: 15px;
+right: 15px;
+background: none;
+border: none;
+color: var(--cool-gray);
+cursor: pointer;
+}
+.modal h2 {
+text-align: center;
+margin-bottom: 24px;
+font-size: 22px;
+}
+.ownerInfo {
+display: flex;
+flex-direction: column;
+align-items: center;
+gap: 12px;
+margin-bottom: 24px;
+padding-bottom: 24px;
+border-bottom: 1px solid var(--deep-blue);
+}
+.avatar {
+width: 80px;
+height: 80px;
+border-radius: 50%;
+object-fit: cover;
+border: 3px solid var(--amber-yellow);
+}
+.ownerName {
+font-size: 18px;
+font-weight: 700;
+}
+.contactList {
+display: flex;
+flex-direction: column;
+gap: 16px;
+}
+.contactItem {
+display: flex;
+align-items: center;
+gap: 16px;
+background-color: var(--deep-blue);
+padding: 12px 16px;
+border-radius: 8px;
+}
+.contactItem a {
+font-size: 16px;
+color: var(--light-gray);
+word-break: break-all;
+}
+.contactItem a:hover {
+text-decoration: underline;
+}
+.icon {
+color: var(--cool-gray);
+flex-shrink: 0;
+}
+.noContacts {
+text-align: center;
+color: var(--cool-gray);
+padding: 20px 0;
+font-size: 16px;
+}
+
+@media (max-width: 500px) {
+.modal {
+width: 90%;
+padding: 30px 20px;
+}
+}

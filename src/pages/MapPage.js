@@ -4,7 +4,8 @@ import YandexMap from '../components/map/YandexMap';
 import FilterPanel from '../components/map/FilterPanel';
 import styles from './MapPage.module.css';
 import api from '../api/axiosConfig';
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown, Search, X } from 'lucide-react';
+import useDebounce from '../hooks/useDebounce';
 
 const defaultFilters = {
     location: '',
@@ -35,9 +36,11 @@ const MapPage = () => {
     const [filters, setFilters] = useState(defaultFilters);
     const [sortBy, setSortBy] = useState('default');
     const [panelState, setPanelState] = useState(PANEL_STATES.PEEKING);
+    const [searchTerm, setSearchTerm] = useState('');
+    const debouncedSearchTerm = useDebounce(searchTerm, 400);
     const listRef = useRef(null);
 
-    const fetchAnnouncements = useCallback(async (currentFilters, currentSortBy) => {
+    const fetchAnnouncements = useCallback(async (currentFilters, currentSortBy, search) => {
         setLoading(true);
         setError(null);
         try {
@@ -45,15 +48,23 @@ const MapPage = () => {
             const apiFilters = { ...currentFilters };
             delete apiFilters.latitude;
             delete apiFilters.longitude;
+
             Object.entries(apiFilters).forEach(([key, value]) => {
                 if (value || (key === 'actual' && value === false)) {
                     params.append(key, value.toString());
                 }
             });
+
+            if (search) {
+                params.append('search', search);
+            }
+
             params.append('sort_by', currentSortBy);
+
             const response = await api.get(`/api/announcements`, { params });
             const responseData = response.data;
             const announcementsArray = responseData.data || responseData;
+
             setAnnouncements(Array.isArray(announcementsArray) ? announcementsArray : []);
             setTotalCount(responseData.total || announcementsArray.length);
         } catch (err) {
@@ -66,8 +77,8 @@ const MapPage = () => {
     }, []);
 
     useEffect(() => {
-        fetchAnnouncements(filters, sortBy);
-    }, [fetchAnnouncements, filters, sortBy]);
+        fetchAnnouncements(filters, sortBy, debouncedSearchTerm);
+    }, [fetchAnnouncements, filters, sortBy, debouncedSearchTerm]);
 
     useEffect(() => {
         if (!selectedId || !listRef.current) return;
@@ -80,7 +91,11 @@ const MapPage = () => {
     const handleSelection = useCallback((announcement) => {
         setSelectedId(announcement.announcement_id);
         if (announcement.latitude && announcement.longitude) {
-            setMapState(prev => ({ ...prev, center: [parseFloat(announcement.longitude), parseFloat(announcement.latitude)], zoom: 15 }));
+            setMapState(prev => ({
+                ...prev,
+                center: [parseFloat(announcement.longitude), parseFloat(announcement.latitude)],
+                zoom: 15
+            }));
         }
     }, []);
 
@@ -92,13 +107,17 @@ const MapPage = () => {
         setFilters(newFilters);
         setActiveTab('announcements');
         if (newFilters.latitude && newFilters.longitude) {
-            setMapState({ center: [parseFloat(newFilters.longitude), parseFloat(newFilters.latitude)], zoom: 12 });
+            setMapState({
+                center: [parseFloat(newFilters.longitude), parseFloat(newFilters.latitude)],
+                zoom: 12
+            });
         }
     };
 
     const handleResetFilters = () => {
         setFilters(defaultFilters);
         setSortBy('default');
+        setSearchTerm('');
     };
 
     const handleSortChange = (e) => {
@@ -119,11 +138,21 @@ const MapPage = () => {
         if (activeTab === 'filters') {
             return <FilterPanel initialFilters={filters} onApply={handleApplyFilters} onReset={handleResetFilters} />;
         }
-        if (loading) { return <div className={styles.statusMessage}>Загрузка объявлений...</div>; }
-        if (error) { return <div className={`${styles.statusMessage} ${styles.error}`}>Ошибка загрузки: {error.message}</div>; }
-        if (announcements.length === 0) { return <div className={styles.statusMessage}>Объявления не найдены. Попробуйте изменить фильтры.</div>; }
+
+        if (loading) {
+            return <div className={styles.statusMessage}>Загрузка объявлений...</div>;
+        }
+
+        if (error) {
+            return <div className={`${styles.statusMessage} ${styles.error}`}>Ошибка загрузки: {error.message}</div>;
+        }
+
+        if (announcements.length === 0) {
+            return <div className={styles.statusMessage}>Объявления не найдены. Попробуйте изменить фильтры.</div>;
+        }
+
         return (
-            <div className={styles.announcementsList} ref={listRef}>
+            <div ref={listRef} className={styles.announcementsList}>
                 {announcements.map((announcement) => (
                     <div key={announcement.announcement_id} data-id={announcement.announcement_id}>
                         <AnnouncementCard
@@ -147,18 +176,30 @@ const MapPage = () => {
                 </div>
                 <div className={styles.panelHeader}>
                     <div className={styles.tabs}>
-                        <button className={`${styles.tab} ${activeTab === 'announcements' ? styles.active : ''}`} onClick={() => setActiveTab('announcements')}>Объявления</button>
-                        <button className={`${styles.tab} ${activeTab === 'filters' ? styles.active : ''}`} onClick={() => setActiveTab('filters')}>Фильтры</button>
+                        <button onClick={() => setActiveTab('announcements')} className={activeTab === 'announcements' ? styles.tab + ' ' + styles.active : styles.tab}>Объявления</button>
+                        <button onClick={() => setActiveTab('filters')} className={activeTab === 'filters' ? styles.tab + ' ' + styles.active : styles.tab}>Фильтры</button>
                     </div>
                     {activeTab === 'announcements' && (
-                        <div className={styles.headerInfo}>
-                            <span className={styles.count}>Найдено {totalCount} объявлений</span>
-                            <select className={styles.sortDropdown} value={sortBy} onChange={handleSortChange}>
-                                <option value="default">По умолчанию</option>
-                                <option value="newest">Сначала новые</option>
-                                <option value="oldest">Сначала старые</option>
-                            </select>
-                        </div>
+                        <>
+                            <div className={styles.panelSearch}>
+                                <Search size={18} className={styles.searchIcon} />
+                                <input
+                                    type="text"
+                                    placeholder="Поиск по кличке, породе..."
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                />
+                                {searchTerm && <button onClick={() => setSearchTerm('')} className={styles.clearButton}><X size={16} /></button>}
+                            </div>
+                            <div className={styles.headerInfo}>
+                                <span className={styles.count}>Найдено {totalCount} объявлений</span>
+                                <select value={sortBy} onChange={handleSortChange} className={styles.sortDropdown}>
+                                    <option value="default">Сначала важные</option>
+                                    <option value="newest">Сначала новые</option>
+                                    <option value="oldest">Сначала старые</option>
+                                </select>
+                            </div>
+                        </>
                     )}
                 </div>
                 {renderContent()}

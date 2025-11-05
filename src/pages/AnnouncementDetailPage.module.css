@@ -7,10 +7,20 @@
     margin: 0 auto;
 }
 
-.status { display: flex; justify-content: center; align-items: center; min-height: 80vh; font-size: 24px; }
-.error { color: var(--red); }
+.status {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 80vh;
+    font-size: 24px;
+}
 
-.contentWrapper, .logWrapper {
+.error {
+    color: var(--red);
+}
+
+.contentWrapper,
+.logWrapper {
     background-color: var(--dark-slate);
     padding: 40px;
     border-radius: 20px;
@@ -27,50 +37,251 @@
     align-items: start;
 }
 
-.gallery { display: flex; flex-direction: column; gap: 16px; }
-.mainPhoto { width: 100%; padding-top: 65%; position: relative; border-radius: 16px; overflow: hidden; background-color: var(--deep-blue); }
-.placeholderImage { width: 100%; height: 100%; position: absolute; top: 0; left: 0; background-color: var(--deep-blue); }
-.mainPhoto img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; }
-.thumbnailGrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 12px; }
-.thumbnail { width: 100%; padding-top: 100%; position: relative; border-radius: 8px; overflow: hidden; cursor: pointer; border: 2px solid transparent; transition: border-color 0.2s; }
-.thumbnail:hover { border-color: var(--cool-gray); }
-.thumbnail.active { border-color: var(--amber-yellow); }
-.thumbnail img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; }
+.gallery {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
 
-.details { display: flex; flex-direction: column; }
-.tag { padding: 6px 12px; border-radius: 6px; font-weight: 600; align-self: flex-start; margin-bottom: 16px; }
-.lostTag { background-color: var(--red); color: white; }
-.defaultTag { background-color: var(--deep-blue); color: var(--amber-yellow); }
-.foundTag { background-color: var(--green); color: white; }
+.mainPhoto {
+    width: 100%;
+    padding-top: 65%;
+    position: relative;
+    border-radius: 16px;
+    overflow: hidden;
+    background-color: var(--deep-blue);
+}
 
-.details h1 { font-size: 32px; margin-bottom: 24px; }
-.description { color: var(--cool-gray); line-height: 1.7; margin-bottom: 32px; }
-.metaGrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-top: auto; padding-top: 24px; border-top: 1px solid var(--deep-blue); }
-.metaItem { display: flex; align-items: center; gap: 12px; font-size: 16px; }
-.metaItem svg { color: var(--cool-gray); flex-shrink: 0; }
-.actions { margin-top: 32px; }
-.contactButton { width: 100%; padding: 16px; border-radius: 8px; border: none; background-color: var(--amber-yellow); color: var(--light-gray); font-weight: 700; font-size: 18px; cursor: pointer; transition: all 0.2s; }
-.contactButton:hover { filter: brightness(1.1); }
-.ownerActions { display: flex; flex-direction: column; gap: 12px; }
-.editButton, .foundButton, .deleteButton { width: 100%; padding: 16px; border-radius: 8px; border: none; font-weight: 700; font-size: 18px; cursor: pointer; transition: all 0.2s; }
-.editButton { background-color: var(--amber-yellow); color: var(--light-gray); }
-.editButton:hover { filter: brightness(1.1); }
-.foundButton { border: 1px solid var(--green); color: var(--green); background: transparent; }
-.foundButton:hover { background-color: var(--green); color: var(--light-gray); }
-.deleteButton { border: 1px solid var(--red); color: var(--red); background: transparent; }
-.deleteButton:hover { background-color: var(--red); color: var(--light-gray); }
+.mainPhoto img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.defaultPetImage {
+    object-fit: cover !important;
+}
+
+.thumbnailGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: 12px;
+}
+
+.thumbnail {
+    width: 100%;
+    padding-top: 100%;
+    position: relative;
+    border-radius: 8px;
+    overflow: hidden;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: border-color 0.2s;
+}
+
+.thumbnail:hover {
+    border-color: var(--cool-gray);
+}
+
+.thumbnail.active {
+    border-color: var(--amber-yellow);
+}
+
+.thumbnail img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.details {
+    display: flex;
+    flex-direction: column;
+}
+
+.tag {
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-weight: 600;
+    align-self: flex-start;
+    margin-bottom: 16px;
+}
+
+.lostTag {
+    background-color: var(--red);
+    color: white;
+}
+
+.defaultTag {
+    background-color: var(--deep-blue);
+    color: var(--amber-yellow);
+}
+
+.foundTag {
+    background-color: var(--green);
+    color: white;
+}
+
+.details h1 {
+    font-size: 32px;
+    margin-bottom: 24px;
+}
+
+.description {
+    color: var(--cool-gray);
+    line-height: 1.7;
+    margin-bottom: 32px;
+}
+
+.metaGrid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    margin-top: auto;
+    padding-top: 24px;
+    border-top: 1px solid var(--deep-blue);
+}
+
+.metaItem {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 16px;
+}
+
+.metaItem svg {
+    color: var(--cool-gray);
+    flex-shrink: 0;
+}
+
+.actions {
+    margin-top: 32px;
+}
+
+.contactButton {
+    width: 100%;
+    padding: 16px;
+    border-radius: 8px;
+    border: none;
+    background-color: var(--amber-yellow);
+    color: var(--light-gray);
+    font-weight: 600;
+    font-size: 18px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.contactButton:hover {
+    filter: brightness(1.1);
+}
+
+.ownerActions {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.editButton,
+.foundButton,
+.deleteButton {
+    width: 100%;
+    padding: 16px;
+    border-radius: 8px;
+    border: none;
+    font-weight: 600;
+    font-size: 18px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.editButton {
+    background-color: var(--amber-yellow);
+    color: var(--light-gray);
+}
+
+.editButton:hover {
+    filter: brightness(1.1);
+}
+
+.foundButton {
+    border: 1px solid var(--green);
+    color: var(--green);
+    background: transparent;
+}
+
+.foundButton:hover {
+    background-color: var(--green);
+    color: var(--light-gray);
+}
+
+.deleteButton {
+    border: 1px solid var(--red);
+    color: var(--red);
+    background: transparent;
+}
+
+.deleteButton:hover {
+    background-color: var(--red);
+    color: var(--light-gray);
+}
 
 @media (max-width: 1024px) {
-    .pageContainer { padding: 100px 24px 40px; }
-    .contentWrapper, .logWrapper { padding: 24px; }
-    .details h1 { font-size: 24px; }
-    .description { font-size: 15px; }
-    .metaItem { font-size: 14px; }
+    .pageContainer {
+        padding: 100px 24px 40px;
+    }
+
+    .contentWrapper,
+    .logWrapper {
+        padding: 24px;
+    }
+
+    .details h1 {
+        font-size: 24px;
+    }
+
+    .description {
+        font-size: 15px;
+    }
+
+    .metaItem {
+        font-size: 14px;
+    }
 }
 
 @media (max-width: 768px) {
-    .pageContainer { padding: 80px 20px 40px; }
-    .mainInfo { grid-template-columns: 1fr; }
-    .metaGrid { grid-template-columns: 1fr; }
-    .details h1 { font-size: 22px; }
+    .pageContainer {
+        padding: 80px 20px 40px;
+    }
+
+    .mainInfo {
+        grid-template-columns: 1fr;
+    }
+
+    .tag {
+        font-size: 14px;
+    }
+
+    .details h1 {
+        font-size: 24px;
+    }
+
+    .description {
+        font-size: 16px;
+    }
+
+    .editButton,
+    .foundButton,
+    .deleteButton,
+    .contactButton {
+        font-size: 16px;
+    }
+
+    .metaGrid {
+        grid-template-columns: 1fr;
+    }
 }

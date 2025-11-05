@@ -1,132 +1,241 @@
-/* --- ДЕСКТОПНАЯ ВЕРСИЯ (ОСНОВНЫЕ СТИЛИ) --- */
 .mapPage {
-    display: flex;
-    padding-top: 84px;
-    height: 100vh;
-    background-color: var(--deep-blue);
-    color: var(--light-gray);
-    box-sizing: border-box;
+display: flex;
+padding-top: 84px;
+height: 100vh;
+background-color: var(--deep-blue);
+color: var(--light-gray);
+box-sizing: border-box;
 }
-
 .leftPanel {
-    width: 50%;
-    min-width: 550px;
-    background: var(--deep-blue);
-    border-right: 1px solid var(--dark-slate);
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    flex-shrink: 0;
+width: 50%;
+min-width: 550px;
+background: var(--deep-blue);
+border-right: 1px solid var(--dark-slate);
+display: flex;
+flex-direction: column;
+overflow: hidden;
+flex-shrink: 0;
 }
-
 .rightPanel {
-    flex-grow: 1;
-    position: relative;
-    background-color: #1a1a1a;
+flex-grow: 1;
+position: relative;
+background-color: #1a1a1a;
 }
-
-.rightPanel > div { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
-
-.panelHeader { padding: 16px; border-bottom: 1px solid var(--dark-slate); flex-shrink: 0; }
-.tabs { display: flex; background-color: var(--dark-slate); border-radius: 8px; padding: 4px; margin-bottom: 16px; }
-.tab { flex: 1; padding: 8px 12px; border: none; background: transparent; color: var(--cool-gray); font-size: 16px; font-weight: 600; cursor: pointer; border-radius: 6px; transition: all 0.2s ease; }
-.tab.active { background-color: var(--deep-blue); color: var(--light-gray); }
-.announcementsList { flex-grow: 1; overflow-y: auto; }
-.headerInfo { display: flex; justify-content: space-between; align-items: center; gap: 16px; }
-.count { font-size: 14px; color: var(--cool-gray); }
-.sortDropdown { background-color: var(--dark-slate); border: 1px solid var(--cool-gray); color: var(--light-gray); font-size: 14px; font-weight: 500; font-family: 'Manrope', sans-serif; cursor: pointer; padding: 6px 12px; border-radius: 6px; appearance: none; background-image: url("data:image/svg+xml,..."); background-repeat: no-repeat; background-position: right 10px center; background-size: 1em; padding-right: 32px; }
-.sortDropdown:focus { outline: none; }
-.statusMessage { display: flex; align-items: center; justify-content: center; flex-grow: 1; padding: 40px 20px; text-align: center; color: var(--cool-gray); font-size: 16px; }
-.error { color: var(--red); }
-.panelContainer { display: contents; }
-.panelHandle { display: none; }
-.hidePanelButton { display: none; }
-
-/* --- АДАПТИВНАЯ ВЕРСИЯ --- */
+.rightPanel > div {
+position: absolute;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+}
+.panelHeader {
+padding: 16px;
+border-bottom: 1px solid var(--dark-slate);
+flex-shrink: 0;
+display: flex;
+flex-direction: column;
+gap: 16px;
+}
+.tabs {
+display: flex;
+background-color: var(--dark-slate);
+border-radius: 8px;
+padding: 4px;
+}
+.tab {
+flex: 1;
+padding: 8px 12px;
+border: none;
+background: transparent;
+color: var(--cool-gray);
+font-size: 16px;
+font-weight: 600;
+cursor: pointer;
+border-radius: 6px;
+transition: all 0.2s ease;
+}
+.tab.active {
+background-color: var(--deep-blue);
+color: var(--light-gray);
+}
+.panelSearch {
+position: relative;
+}
+.panelSearch .searchIcon {
+position: absolute;
+left: 12px;
+top: 50%;
+transform: translateY(-50%);
+color: var(--cool-gray);
+pointer-events: none;
+}
+.panelSearch input {
+width: 100%;
+background-color: var(--dark-slate);
+border: 1px solid var(--cool-gray);
+border-radius: 8px;
+padding: 10px 12px 10px 40px;
+color: var(--light-gray);
+font-size: 15px;
+font-family: 'Manrope', sans-serif;
+transition: border-color 0.2s;
+}
+.panelSearch input:focus {
+outline: none;
+border-color: var(--amber-yellow);
+}
+.panelSearch .clearButton {
+position: absolute;
+right: 10px;
+top: 50%;
+transform: translateY(-50%);
+background: none;
+border: none;
+color: var(--cool-gray);
+cursor: pointer;
+padding: 4px;
+display: flex;
+}
+.announcementsList {
+flex-grow: 1;
+overflow-y: auto;
+}
+.headerInfo {
+display: flex;
+justify-content: space-between;
+align-items: center;
+gap: 16px;
+}
+.count {
+font-size: 14px;
+color: var(--cool-gray);
+}
+.sortDropdown {
+background-color: var(--dark-slate);
+border: 1px solid var(--cool-gray);
+color: var(--light-gray);
+font-size: 14px;
+font-weight: 500;
+font-family: 'Manrope', sans-serif;
+cursor: pointer;
+padding: 6px 12px;
+border-radius: 6px;
+appearance: none;
+background-image: url("data:image/svg+xml,...");
+background-repeat: no-repeat;
+background-position: right 10px center;
+background-size: 1em;
+padding-right: 32px;
+}
+.sortDropdown:focus {
+outline: none;
+}
+.statusMessage {
+display: flex;
+align-items: center;
+justify-content: center;
+flex-grow: 1;
+padding: 40px 20px;
+text-align: center;
+color: var(--cool-gray);
+font-size: 16px;
+}
+.error {
+color: var(--red);
+}
+.panelContainer {
+display: contents;
+}
+.panelHandle {
+display: none;
+}
+.hidePanelButton {
+display: none;
+}
 @media (max-width: 1024px) {
-    .mapPage {
-        padding-top: 0;
-        position: relative;
-        overflow: hidden;
-    }
-    
-    .rightPanel {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        z-index: 1;
-        cursor: pointer;
-    }
-
-    .leftPanel {
-        width: 100%;
-        min-width: 100%;
-        height: calc(100vh - 84px);
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        z-index: 10;
-        transition: transform 0.4s ease-in-out;
-        border-top-left-radius: 16px;
-        border-top-right-radius: 16px;
-        box-shadow: 0 -5px 20px rgba(0,0,0,0.3);
-        padding-top: 30px;
-    }
-    
-    .peeking .leftPanel {
-        transform: translateY(calc(100% - 300px));
-    }
-    .expanded .leftPanel {
-        transform: translateY(0);
-    }
-    .hidden .leftPanel {
-        transform: translateY(calc(100% - 30px));
-    }
-
-    .panelHandle {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        cursor: grab;
-        width: 100%;
-        height: 30px;
-        position: absolute;
-        top: 0;
-        left: 0;
-        background: transparent;
-        touch-action: none;
-    }
-    .panelHandle:active { cursor: grabbing; }
-    .handleBar {
-        width: 40px;
-        height: 5px;
-        background-color: var(--cool-gray);
-        border-radius: 3px;
-    }
-    
-    .panelHeader {
-        padding-top: 0;
-    }
-
-    .hidePanelButton {
-        display: flex;
-        position: absolute;
-        bottom: 16px;
-        left: 50%;
-        transform: translateX(-50%);
-        background-color: rgba(45, 55, 72, 0.8);
-        backdrop-filter: blur(5px);
-        border: 1px solid var(--cool-gray);
-        border-radius: 50%;
-        padding: 8px;
-        color: var(--light-gray);
-        cursor: pointer;
-        z-index: 5;
-        transition: opacity 0.3s, transform 0.3s;
-    }
-    
-    .peeking .hidePanelButton { opacity: 1; }
-    .expanded .hidePanelButton, .hidden .hidePanelButton { opacity: 0; pointer-events: none; }
+.mapPage {
+padding-top: 0;
+position: relative;
+overflow: hidden;
+}
+.rightPanel {
+position: absolute;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+z-index: 1;
+cursor: pointer;
+}
+.leftPanel {
+width: 100%;
+min-width: 100%;
+height: calc(100vh - 84px);
+position: absolute;
+bottom: 0;
+left: 0;
+z-index: 10;
+transition: transform 0.4s ease-in-out;
+border-top-left-radius: 16px;
+border-top-right-radius: 16px;
+box-shadow: 0 -5px 20px rgba(0,0,0,0.3);
+padding-top: 30px;
+}
+.peeking .leftPanel {
+transform: translateY(calc(100% - 300px));
+}
+.expanded .leftPanel {
+transform: translateY(0);
+}
+.hidden .leftPanel {
+transform: translateY(calc(100% - 30px));
+}
+.panelHandle {
+display: flex;
+justify-content: center;
+align-items: center;
+cursor: grab;
+width: 100%;
+height: 30px;
+position: absolute;
+top: 0;
+left: 0;
+background: transparent;
+touch-action: none;
+}
+.panelHandle:active {
+cursor: grabbing;
+}
+.handleBar {
+width: 40px;
+height: 5px;
+background-color: var(--cool-gray);
+border-radius: 3px;
+}
+.panelHeader {
+padding-top: 0;
+}
+.hidePanelButton {
+display: flex;
+position: absolute;
+bottom: 16px;
+left: 50%;
+transform: translateX(-50%);
+background-color: rgba(45, 55, 72, 0.8);
+backdrop-filter: blur(5px);
+border: 1px solid var(--cool-gray);
+border-radius: 50%;
+padding: 8px;
+color: var(--light-gray);
+cursor: pointer;
+z-index: 5;
+transition: opacity 0.3s, transform 0.3s;
+}
+.peeking .hidePanelButton {
+opacity: 1;
+}
+.expanded .hidePanelButton, .hidden .hidePanelButton {
+opacity: 0;
+pointer-events: none;
+}
 }

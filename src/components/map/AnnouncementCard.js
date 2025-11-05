@@ -1,11 +1,23 @@
 import React from 'react';
 import { MapPin, Clock, Palette, User } from 'lucide-react';
 import styles from './AnnouncementCard.module.css';
+import defaultIcon from '../../assets/icons/default.svg';
 
 const AnnouncementCard = ({ announcement, onClick, isSelected }) => {
     const getStatusTag = (announcement) => {
-        if (announcement.status === 'archived') { return { text: 'В архиве', className: styles.archivedTag }; }
-        if (announcement.is_featured) { return { text: 'Срочный поиск', className: styles.urgentTag }; }
+        if (announcement.status === 'archived') {
+            return { text: 'В архиве', className: styles.archivedTag };
+        }
+
+        const creationDate = new Date(announcement.created_at);
+        const now = new Date();
+        const fiveDaysInMs = 5 * 24 * 60 * 60 * 1000;
+        const isRecent = (now - creationDate) <= fiveDaysInMs;
+
+        if (isRecent || announcement.is_featured) {
+            return { text: 'Срочный поиск', className: styles.urgentTag };
+        }
+
         return { text: 'В поиске', className: styles.defaultTag };
     };
 
@@ -19,20 +31,23 @@ const AnnouncementCard = ({ announcement, onClick, isSelected }) => {
     };
 
     const statusTag = getStatusTag(announcement);
-    const imageUrl = announcement.photos?.[0]?.url || '/images/mock/story-cat1.png';
+    const imageUrl = announcement.photos?.[0]?.url || defaultIcon;
     const cardClasses = `${styles.card} ${isSelected ? styles.selectedCard : ''}`;
 
     return (
         <div className={cardClasses} onClick={() => onClick && onClick(announcement)}>
             <div className={styles.imageContainer}>
-                <img src={imageUrl} alt={announcement.pet_breed} className={styles.petImage} />
+                <img
+                    src={imageUrl}
+                    alt={announcement.pet_breed}
+                    className={`${styles.petImage} ${!announcement.photos || announcement.photos.length === 0 ? styles.defaultPetImage : ''}`}
+                />
                 {statusTag && (
                     <span className={`${styles.statusTag} ${statusTag.className}`}>
                         {statusTag.text}
                     </span>
                 )}
             </div>
-
             <div className={styles.content}>
                 <h4 className={styles.title}>Пропал(а) {announcement.pet_breed}, кличка "{announcement.pet_name}"</h4>
                 <p className={styles.description}>{announcement.description}</p>

@@ -14,15 +14,13 @@ const LogEntry = ({ log }) => {
         <div className={styles.logEntry}>
             <div className={styles.entryHeader}>
                 <span className={styles.author}>{log.user?.name || 'Аноним'}</span>
-                <span className={styles.date}>{formatDate(log.created_at)}</span>
+                <span>{formatDate(log.created_at)}</span>
             </div>
             <p className={styles.comment}>{log.comment}</p>
             {log.photos && log.photos.length > 0 && (
                 <div className={styles.photoGrid}>
                     {log.photos.map(photo => (
-                        <a key={photo.photo_id} href={photo.url} target="_blank" rel="noopener noreferrer">
-                            <img src={photo.url} alt="Фото из журнала поиска" />
-                        </a>
+                        <img key={photo.photo_id} src={photo.url} alt="Фото из журнала поиска" />
                     ))}
                 </div>
             )}
@@ -38,20 +36,26 @@ const AddLogEntryForm = ({ announcementId, onLogAdded, onCancel }) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!comment.trim()) { setError('Комментарий не может быть пустым.'); return; }
+        if (!comment.trim()) {
+            setError('Комментарий не может быть пустым.');
+            return;
+        }
         setError('');
         setSubmitting(true);
-
         const formData = new FormData();
         formData.append('comment', comment);
-        photos.forEach(photo => { formData.append('photos[]', photo); });
+        photos.forEach(photo => {
+            formData.append('photos[]', photo);
+        });
 
         try {
-            await api.post(`/api/announcements/${announcementId}/logs`, formData, { headers: { 'Content-Type': 'multipart/form-data' } });
+            await api.post(`/api/announcements/${announcementId}/logs`, formData, {
+                headers: { 'Content-Type': 'multipart/form-data' }
+            });
             setComment('');
             setPhotos([]);
             onLogAdded();
-            onCancel(); // Закрываем форму после успеха
+            onCancel();
         } catch (err) {
             setError('Не удалось добавить запись. Попробуйте снова.');
             console.error(err);
@@ -64,7 +68,7 @@ const AddLogEntryForm = ({ announcementId, onLogAdded, onCancel }) => {
         <form onSubmit={handleSubmit} className={styles.form}>
             <h4>Добавить запись в журнал</h4>
             <p>Опишите, где и при каких обстоятельствах вы видели животное. Прикрепите фото, если удалось его сделать.</p>
-            <textarea value={comment} onChange={(e) => setComment(e.target.value)} placeholder="Ваш комментарий..." rows="4" className={styles.textarea} />
+            <textarea value={comment} onChange={e => setComment(e.target.value)} placeholder="Ваш комментарий..." rows="4" className={styles.textarea} />
             <ImageUploader newFiles={photos} onNewFilesChange={setPhotos} maxFiles={3} />
             {error && <p className={styles.error}>{error}</p>}
             <div className={styles.formActions}>
@@ -77,11 +81,12 @@ const AddLogEntryForm = ({ announcementId, onLogAdded, onCancel }) => {
     );
 };
 
-const SearchLog = ({ announcementId }) => {
-    const { user } = useAuth();
+const SearchLog = ({ announcementId, isOwner }) => {
+    const { user, updateVolunteerStatus } = useAuth();
     const [logs, setLogs] = useState([]);
     const [loading, setLoading] = useState(true);
     const [isFormVisible, setIsFormVisible] = useState(false);
+    const [isToggling, setIsToggling] = useState(false);
 
     const fetchLogs = useCallback(async () => {
         try {
@@ -94,9 +99,25 @@ const SearchLog = ({ announcementId }) => {
         }
     }, [announcementId]);
 
-    useEffect(() => { fetchLogs(); }, [fetchLogs]);
+    useEffect(() => {
+        fetchLogs();
+    }, [fetchLogs]);
 
-    if (loading) { return <p>Загрузка журнала поиска...</p>; }
+    const handleVolunteerToggle = async (e) => {
+        const newStatus = e.target.checked;
+        setIsToggling(true);
+        try {
+            await updateVolunteerStatus(newStatus);
+        } catch (error) {
+            console.error("Failed to update volunteer status", error);
+        } finally {
+            setIsToggling(false);
+        }
+    };
+
+    if (loading) {
+        return <p>Загрузка журнала поиска...</p>;
+    }
 
     return (
         <div className={styles.container}>
@@ -104,11 +125,24 @@ const SearchLog = ({ announcementId }) => {
                 <h3>Журнал поиска</h3>
                 {user?.is_volunteer && !isFormVisible && (
                     <button onClick={() => setIsFormVisible(true)} className={styles.addEntryButton}>
-                        <Plus size={20} /> Добавить запись в журнал
+                        <Plus size={20} /> Добавить запись
                     </button>
                 )}
+                {user && !user.is_volunteer && !isOwner && (
+                    <div className={styles.volunteerToggleContainer}>
+                        <span>Стать волонтером</span>
+                        <label className={styles.switch}>
+                            <input
+                                type="checkbox"
+                                checked={user.is_volunteer}
+                                onChange={handleVolunteerToggle}
+                                disabled={isToggling}
+                            />
+                            <span className={styles.slider}></span>
+                        </label>
+                    </div>
+                )}
             </div>
-
             {isFormVisible && (
                 <AddLogEntryForm
                     announcementId={announcementId}
@@ -116,7 +150,6 @@ const SearchLog = ({ announcementId }) => {
                     onCancel={() => setIsFormVisible(false)}
                 />
             )}
-
             <div className={styles.logsList}>
                 {logs.length > 0 ? (
                     logs.map(log => <LogEntry key={log.log_id} log={log} />)
