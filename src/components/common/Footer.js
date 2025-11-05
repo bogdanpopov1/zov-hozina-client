@@ -12,12 +12,11 @@ const Footer = () => {
     return (
         <footer className={styles.footer}>
             <div className={styles.footerContainer}>
-                {/* === ДЕСКТОПНАЯ ВЕРСИЯ === */}
                 <div className={styles.desktopFooter}>
                     <div className={styles.mainContent}>
                         <div className={styles.brandColumn}>
                             <Link to="/" className={styles.logo}><img src={logo} alt="Зов Хозяина" /></Link>
-                            <p>Объединяем тех, кто ищет,<br/>с теми, кто хочет помочь.</p>
+                            <p>Объединяем тех, кто ищет,<br />с теми, кто хочет помочь.</p>
                         </div>
                         <div className={styles.linksColumn}>
                             <h4>Помощь владельцам</h4>
@@ -35,19 +34,15 @@ const Footer = () => {
                         </div>
                         <div className={styles.ctaColumn}>
                             <Link to="/map" className={styles.mapButton}>Карта поисков</Link>
-                            <a href="#" className={styles.telegramLink}>
+                            <a href="https://t.me/your_bot_name" target="_blank" rel="noopener noreferrer" className={styles.telegramLink}>
                                 <span>Подпишитесь на наш</span>
-                                <span className={styles.telegramBotLine}>
-                                    телеграм-бот <FaTelegramPlane />
-                                </span>
+                                <span className={styles.telegramBotLine}> телеграм-бот <FaTelegramPlane /> </span>
                             </a>
                         </div>
                     </div>
                 </div>
-
-                {/* === МОБИЛЬНАЯ ВЕРСИЯ === */}
                 <div className={styles.mobileFooter}>
-                     <details className={styles.mobileDropdown}>
+                    <details className={styles.mobileDropdown}>
                         <summary onClick={() => setIsOwnersMenuOpen(!isOwnersMenuOpen)}>
                             Владельцам {isOwnersMenuOpen ? <ChevronUp /> : <ChevronDown />}
                         </summary>
@@ -57,29 +52,26 @@ const Footer = () => {
                             <Link to="/tips">Полезные советы</Link>
                             <Link to="/stories">Счастливые истории</Link>
                         </div>
-                     </details>
-                     <details className={styles.mobileDropdown}>
+                    </details>
+                    <details className={styles.mobileDropdown}>
                         <summary onClick={() => setIsVolunteersMenuOpen(!isVolunteersMenuOpen)}>
-                             Волонтерам {isVolunteersMenuOpen ? <ChevronUp /> : <ChevronDown />}
+                            Волонтерам {isVolunteersMenuOpen ? <ChevronUp /> : <ChevronDown />}
                         </summary>
-                         <div className={styles.dropdownMenu}>
+                        <div className={styles.dropdownMenu}>
                             <Link to="/about-volunteers">Кто такие волонтеры</Link>
                             <Link to="/memo">Памятка волонтера</Link>
                             <Link to="/templates">Шаблоны объявлений</Link>
                             <Link to="/rating">Рейтинг волонтеров</Link>
                         </div>
-                     </details>
+                    </details>
                     <div className={styles.mobileActions}>
                         <Link to="/map" className={styles.mapButton}>Карта поисков</Link>
-                        <a href="#" className={styles.telegramLink}>
+                        <a href="https://t.me/your_bot_name" target="_blank" rel="noopener noreferrer" className={styles.telegramLink}>
                             <span>Подпишитесь на наш</span>
-                            <span className={styles.telegramBotLine}>
-                                телеграм-бот <FaTelegramPlane />
-                            </span>
+                            <span className={styles.telegramBotLine}> телеграм-бот <FaTelegramPlane /> </span>
                         </a>
                     </div>
                 </div>
-
                 <div className={styles.bottomBar}>
                     <p>© {new Date().getFullYear()} «Зов хозяина». Все права защищены.</p>
                     <Link to="/privacy">Политика конфиденциальности</Link>

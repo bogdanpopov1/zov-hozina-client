@@ -3,25 +3,22 @@ import styles from './ZoneMapModal.module.css';
 import { X } from 'lucide-react';
 
 const ZoneMapModal = ({ onClose, onSave }) => {
-    const mapContainerRef = useRef(null); // Ref для DOM-элемента карты
-    const mapInstanceRef = useRef(null); // Ref для хранения экземпляра карты Яндекса
+    const mapContainerRef = useRef(null);
+    const mapInstanceRef = useRef(null);
     const placemarkRef = useRef(null);
     const circleRef = useRef(null);
     const ymapsApiRef = useRef(null);
-
     const [locationName, setLocationName] = useState('');
-    const [radius, setRadius] = useState(1); // Default 5km
-    const [center, setCenter] = useState([55.796127, 49.106414]); // Default Kazan
+    const [radius, setRadius] = useState(1);
+    const [center, setCenter] = useState([55.796127, 49.106414]);
     const [error, setError] = useState('');
     const [isSaving, setIsSaving] = useState(false);
 
     useEffect(() => {
         const initMap = () => {
-            // Строгая проверка: инициализируем, только если есть контейнер и нет уже созданной карты
             if (!mapContainerRef.current || mapInstanceRef.current) {
                 return;
             }
-
             ymapsApiRef.current = window.ymaps;
             const map = new ymapsApiRef.current.Map(mapContainerRef.current, {
                 center: center,
@@ -29,8 +26,6 @@ const ZoneMapModal = ({ onClose, onSave }) => {
                 controls: ['zoomControl'],
                 type: 'yandex#hybrid'
             });
-
-            // Сохраняем экземпляр в ref, чтобы он "пережил" перемонтирование
             mapInstanceRef.current = map;
 
             const placemark = new ymapsApiRef.current.Placemark(center, {}, {
@@ -60,14 +55,13 @@ const ZoneMapModal = ({ onClose, onSave }) => {
             window.ymaps.ready(initMap);
         }
 
-        // Функция очистки. Теперь она гарантированно будет иметь доступ к правильному экземпляру карты
         return () => {
             if (mapInstanceRef.current) {
                 mapInstanceRef.current.destroy();
                 mapInstanceRef.current = null;
             }
         };
-    }, []); // Пустой массив зависимостей по-прежнему правильный
+    }, [center, radius]);
 
     useEffect(() => {
         if (circleRef.current) {
@@ -110,7 +104,6 @@ const ZoneMapModal = ({ onClose, onSave }) => {
                 <h3>Добавить новую зону</h3>
                 <p>Перетащите метку в центр нужной зоны и выберите радиус.</p>
                 <div ref={mapContainerRef} className={styles.mapContainer}></div>
-                
                 <div className={styles.controls}>
                     <div className={styles.formGroup}>
                         <label>Название зоны</label>
@@ -133,9 +126,7 @@ const ZoneMapModal = ({ onClose, onSave }) => {
                         />
                     </div>
                 </div>
-
                 {error && <p className={styles.error}>{error}</p>}
-                
                 <div className={styles.actions}>
                     <button onClick={onClose} className={styles.cancelButton}>Отмена</button>
                     <button onClick={handleSave} disabled={isSaving} className={styles.saveButton}>

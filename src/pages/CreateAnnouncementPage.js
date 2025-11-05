@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../api/axiosConfig';
 import { useAuth } from '../context/AuthContext';
@@ -31,16 +31,13 @@ const CreateAnnouncementPage = () => {
         color: '',
         age: '',
     });
-
     const [existingPhotos, setExistingPhotos] = useState([]);
     const [newPhotos, setNewPhotos] = useState([]);
     const [photosToDelete, setPhotosToDelete] = useState([]);
     const [primaryPhotoId, setPrimaryPhotoId] = useState(null);
-
     const [addressSuggestions, setAddressSuggestions] = useState([]);
     const [isAddressSuggestionsVisible, setAddressSuggestionsVisible] = useState(false);
     const debouncedLocationInput = useDebounce(formData.location_address, 400);
-
     const [isAuthModalOpen, setAuthModalOpen] = useState(false);
     const [errors, setErrors] = useState({});
     const [submitting, setSubmitting] = useState(false);
@@ -148,17 +145,7 @@ const CreateAnnouncementPage = () => {
         }
     };
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setErrors({});
-        if (!user) {
-            setAuthModalOpen(true);
-            return;
-        }
-        await submitData();
-    };
-
-    const submitData = async () => {
+    const submitData = useCallback(async () => {
         if (isSubmittingRef.current) return;
         isSubmittingRef.current = true;
         setSubmitting(true);
@@ -174,7 +161,6 @@ const CreateAnnouncementPage = () => {
                 data.append(key, dataToSend[key]);
             }
         }
-
         newPhotos.forEach(file => {
             data.append('photos[]', file);
         });
@@ -189,7 +175,7 @@ const CreateAnnouncementPage = () => {
         try {
             let response;
             if (isEditMode) {
-                data.append('_method', 'PUT'); 
+                data.append('_method', 'PUT');
                 response = await api.post(`/api/announcements/${announcementToEdit.announcement_id}`, data);
                 clearAnnouncementToEdit();
                 navigate(`/announcements/${response.data.announcement_id}`);
@@ -208,6 +194,16 @@ const CreateAnnouncementPage = () => {
             isSubmittingRef.current = false;
             setSubmitting(false);
         }
+    }, [formData, newPhotos, isEditMode, photosToDelete, primaryPhotoId, announcementToEdit, clearAnnouncementToEdit, navigate, resetQuickForm]);
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setErrors({});
+        if (!user) {
+            setAuthModalOpen(true);
+            return;
+        }
+        await submitData();
     };
 
     useEffect(() => {
@@ -215,7 +211,7 @@ const CreateAnnouncementPage = () => {
             setAuthModalOpen(false);
             submitData();
         }
-    }, [user, isAuthModalOpen]);
+    }, [user, isAuthModalOpen, submitData]);
 
     return (
         <>
@@ -225,15 +221,25 @@ const CreateAnnouncementPage = () => {
                     <p className={styles.subtitle}>
                         {isEditMode ? 'Обновите информацию о вашем питомце.' : 'Заполните все детали, чтобы повысить шансы на успешный поиск.'}
                     </p>
-
                     <div className={styles.formSection}>
                         <h3>Тип объявления</h3>
                         <div className={styles.buttonGroup}>
-                            <button type="button" onClick={() => handleChange({ target: { name: 'announcement_type', value: 'lost' } })} className={formData.announcement_type === 'lost' ? styles.active : ''}>Ищу питомца</button>
-                            <button type="button" onClick={() => handleChange({ target: { name: 'announcement_type', value: 'found' } })} className={formData.announcement_type === 'found' ? styles.active : ''}>Нашел питомца</button>
+                            <button
+                                type="button"
+                                onClick={() => handleChange({ target: { name: 'announcement_type', value: 'lost' } })}
+                                className={formData.announcement_type === 'lost' ? styles.active : ''}
+                            >
+                                Ищу питомца
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => handleChange({ target: { name: 'announcement_type', value: 'found' } })}
+                                className={formData.announcement_type === 'found' ? styles.active : ''}
+                            >
+                                Нашел питомца
+                            </button>
                         </div>
                     </div>
-
                     <form onSubmit={handleSubmit}>
                         <div className={styles.formSection}>
                             <h3>Основная информация</h3>
@@ -286,7 +292,6 @@ const CreateAnnouncementPage = () => {
                                 </div>
                             </div>
                         </div>
-
                         <div className={styles.formSection}>
                             <h3>Фотографии</h3>
                             <ImageUploader
@@ -299,7 +304,6 @@ const CreateAnnouncementPage = () => {
                             />
                             {errors.photos && <span className={styles.fieldError}>{errors.photos[0]}</span>}
                         </div>
-
                         <div className={styles.formSection}>
                             <h3>Описание и местоположение</h3>
                             <div className={styles.formGroup}>
@@ -330,9 +334,8 @@ const CreateAnnouncementPage = () => {
                                 )}
                             </div>
                         </div>
-
                         {errors.general && <div className={styles.error}>{errors.general}</div>}
-                        <button type="submit" className={styles.submitButton} disabled={submitting}>
+                        <button type="submit" disabled={submitting} className={styles.submitButton}>
                             {submitting ? 'Сохранение...' : (isEditMode ? 'Сохранить изменения' : 'Опубликовать объявление')}
                         </button>
                     </form>

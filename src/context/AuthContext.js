@@ -1,5 +1,4 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
-import axios from 'axios';
 import api from '../api/axiosConfig';
 
 const AuthContext = createContext(null);
@@ -8,7 +7,6 @@ export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [token, setToken] = useState(localStorage.getItem('token'));
     const [isLoading, setIsLoading] = useState(true);
-    const API_URL = process.env.REACT_APP_API_URL;
 
     useEffect(() => {
         const checkLoggedIn = async () => {
@@ -96,7 +94,7 @@ export const AuthProvider = ({ children }) => {
     const updateVolunteerStatus = async (isVolunteer) => {
         try {
             const response = await api.put('/api/user/volunteer-status', { is_volunteer: isVolunteer });
-            setUser(response.data); // Обновляем пользователя новыми данными с сервера
+            setUser(response.data);
             return { success: true };
         } catch (error) {
             console.error("Failed to update volunteer status", error);

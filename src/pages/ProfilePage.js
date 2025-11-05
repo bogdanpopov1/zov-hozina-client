@@ -41,8 +41,17 @@ const ProfilePage = () => {
             const options = {
                 method: "POST",
                 mode: "cors",
-                headers: { "Content-Type": "application/json", "Accept": "application/json", "Authorization": "Token " + token },
-                body: JSON.stringify({ query: debouncedLocation, count: 5, from_bound: { "value": "city" }, to_bound: { "value": "city" } })
+                headers: {
+                    "Content-Type": "application/json",
+                    "Accept": "application/json",
+                    "Authorization": "Token " + token
+                },
+                body: JSON.stringify({
+                    query: debouncedLocation,
+                    count: 5,
+                    from_bound: { "value": "city" },
+                    to_bound: { "value": "city" }
+                })
             };
             fetch(url, options)
                 .then(response => response.json())
@@ -77,7 +86,7 @@ const ProfilePage = () => {
 
     const validateForm = () => {
         const errors = {};
-        const phoneRegex = /^(\+7|7|8)?[\s\-]?\(?[489][0-9]{2}\)?[\s\-]?[0-9]{3}[\s\-]?[0-9]{2}[\s\-]?[0-9]{2}$/;
+        const phoneRegex = /^(\+7|7|8)?[\s-]?\(?[489][0-9]{2}\)?[\s-]?[0-9]{3}[\s-]?[0-9]{2}[\s-]?[0-9]{2}$/;
         if (formData.phone && !phoneRegex.test(formData.phone)) {
             errors.phone = 'Введите корректный российский номер телефона.';
         }
@@ -110,34 +119,33 @@ const ProfilePage = () => {
                 <h1>Профиль пользователя</h1>
                 <div className={styles.profileContent}>
                     <div className={styles.avatarSection}>
-                        <img src={user.avatar || `https://api.dicebear.com/8.x/initials/svg?seed=${user.name}`} alt="Аватар" />
+                        <img src={user.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=3B82F6&color=fff`} alt={user.name} />
                         <h2>{user.name}</h2>
                         <p>{user.email}</p>
                     </div>
-
                     <div className={styles.formSection}>
                         <form onSubmit={handleSubmit} className={styles.profileForm}>
-                             <div className={styles.formGrid}>
+                            <div className={styles.formGrid}>
                                 <div className={styles.formGroup}>
-                                    <label htmlFor="name">Имя</label>
-                                    <input type="text" id="name" name="name" value={formData.name} onChange={handleChange} />
+                                    <label>Имя</label>
+                                    <input type="text" name="name" value={formData.name} onChange={handleChange} />
                                 </div>
                                 <div className={styles.formGroup}>
-                                    <label htmlFor="email">Email</label>
-                                    <input type="email" id="email" name="email" value={formData.email} disabled />
+                                    <label>Email</label>
+                                    <input type="email" name="email" value={formData.email} disabled />
                                 </div>
                                 <div className={styles.formGroup}>
-                                    <label htmlFor="phone">Телефон</label>
-                                    <input type="tel" id="phone" name="phone" value={formData.phone} onChange={handleChange} />
+                                    <label>Телефон</label>
+                                    <input type="text" name="phone" value={formData.phone} onChange={handleChange} />
                                     {formErrors.phone && <span className={styles.errorText}>{formErrors.phone}</span>}
                                 </div>
                                 <div className={styles.formGroup}>
-                                    <label htmlFor="telegram_username">Telegram</label>
-                                    <input type="text" id="telegram_username" name="telegram_username" value={formData.telegram_username} onChange={handleChange} placeholder="@username" />
+                                    <label>Telegram</label>
+                                    <input type="text" name="telegram_username" value={formData.telegram_username} onChange={handleChange} />
                                 </div>
                                 <div className={`${styles.formGroup} ${styles.locationGroup}`}>
-                                    <label htmlFor="location">Город</label>
-                                    <input type="text" id="location" name="location" value={formData.location} onChange={handleChange} autoComplete="off" />
+                                    <label>Город</label>
+                                    <input type="text" name="location" value={formData.location} onChange={handleChange} />
                                     {citySuggestions.length > 0 && (
                                         <ul className={styles.suggestionsList}>
                                             {citySuggestions.map((s, i) => (
@@ -149,8 +157,8 @@ const ProfilePage = () => {
                                     )}
                                 </div>
                                 <div className={styles.formGroup}>
-                                    <label htmlFor="bio">О себе</label>
-                                    <textarea id="bio" name="bio" rows="4" value={formData.bio} onChange={handleChange}></textarea>
+                                    <label>О себе</label>
+                                    <textarea name="bio" value={formData.bio} onChange={handleChange}></textarea>
                                 </div>
                             </div>
                             <div className={styles.formActions}>
@@ -158,7 +166,6 @@ const ProfilePage = () => {
                                 <button type="button" onClick={logout} className={styles.logoutButton}>Выйти</button>
                             </div>
                         </form>
-
                         <div className={styles.volunteerSection}>
                             <div className={styles.volunteerToggleHeader}>
                                 <div>
@@ -166,11 +173,7 @@ const ProfilePage = () => {
                                     <p>Включите, чтобы помогать в поисках и получать уведомления.</p>
                                 </div>
                                 <label className={styles.switch}>
-                                    <input
-                                        type="checkbox"
-                                        checked={isVolunteer}
-                                        onChange={handleVolunteerToggle}
-                                    />
+                                    <input type="checkbox" checked={isVolunteer} onChange={handleVolunteerToggle} />
                                     <span className={styles.slider}></span>
                                 </label>
                             </div>

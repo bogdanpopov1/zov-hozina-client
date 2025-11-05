@@ -1,0 +1,17 @@
+.avatarImage, .avatarPlaceholder {
+width: 100%;
+height: 100%;
+border-radius: 50%;
+object-fit: cover;
+display: flex;
+align-items: center;
+justify-content: center;
+font-weight: 700;
+color: white;
+text-transform: uppercase;
+}
+
+.initials {
+font-size: 45%;
+line-height: 1;
+}

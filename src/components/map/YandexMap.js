@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import styles from '../../pages/MapPage.module.css';
 
 const YandexMap = ({ announcements, mapState, selectedId, onPlacemarkClick, onBalloonClose }) => {
     const mapContainerRef = useRef(null);
@@ -20,7 +19,9 @@ const YandexMap = ({ announcements, mapState, selectedId, onPlacemarkClick, onBa
     }, []);
 
     useEffect(() => {
-        if (!ymapsApi || !mapContainerRef.current) { return; }
+        if (!ymapsApi || !mapContainerRef.current) {
+            return;
+        }
         if (!mapInstanceRef.current) {
             const map = new ymapsApi.Map(mapContainerRef.current, {
                 center: mapState.center.slice().reverse(),
@@ -33,6 +34,7 @@ const YandexMap = ({ announcements, mapState, selectedId, onPlacemarkClick, onBa
                 data: { content: 'Спутник' },
                 options: { selectOnClick: false, maxWidth: 150 }
             });
+
             typeSelector.events.add('click', () => {
                 const mapContainer = mapContainerRef.current;
                 if (map.getType() === 'yandex#map') {
@@ -45,26 +47,36 @@ const YandexMap = ({ announcements, mapState, selectedId, onPlacemarkClick, onBa
                     mapContainer.classList.add('dark-mode');
                 }
             });
+
             map.controls.add(typeSelector, { position: { top: '65px', left: '10px' } });
             mapInstanceRef.current = map;
             mapContainerRef.current.classList.add('dark-mode');
         }
 
         const map = mapInstanceRef.current;
-        const handleBalloonClose = () => { if (onBalloonClose) { onBalloonClose(); } };
+        const handleBalloonClose = () => {
+            if (onBalloonClose) {
+                onBalloonClose();
+            }
+        };
         map.events.add('balloonclose', handleBalloonClose);
 
         return () => {
-            if (map) { map.events.remove('balloonclose', handleBalloonClose); }
-            if (mapInstanceRef.current) { mapInstanceRef.current.destroy(); mapInstanceRef.current = null; }
+            if (map) {
+                map.events.remove('balloonclose', handleBalloonClose);
+            }
+            if (mapInstanceRef.current) {
+                mapInstanceRef.current.destroy();
+                mapInstanceRef.current = null;
+            }
         };
-    }, [ymapsApi, onBalloonClose]);
+    }, [ymapsApi, onBalloonClose, mapState.center, mapState.zoom]);
 
     useEffect(() => {
         if (mapInstanceRef.current) {
             mapInstanceRef.current.setCenter(mapState.center.slice().reverse(), mapState.zoom);
         }
-    }, [mapState]);
+    }, [mapState.center, mapState.zoom]);
 
     useEffect(() => {
         const map = mapInstanceRef.current;
@@ -78,7 +90,9 @@ const YandexMap = ({ announcements, mapState, selectedId, onPlacemarkClick, onBa
                 const placemark = new ymapsApi.Placemark([ad.latitude, ad.longitude], {}, {
                     preset: isSelected ? 'islands#yellowIcon' : 'islands#blueIcon'
                 });
+
                 placemark.events.add('click', () => onPlacemarkClick(ad));
+
                 if (isSelected) {
                     const prefix = ad.gender === 'female' ? 'Пропала' : 'Пропал';
                     map.balloon.open(placemark.geometry.getCoordinates(), {
@@ -100,14 +114,17 @@ const YandexMap = ({ announcements, mapState, selectedId, onPlacemarkClick, onBa
                 };
             }
         };
-
         map.events.add('balloonopen', balloonOpenHandler);
+
         return () => {
-            if(map) map.events.remove('balloonopen', balloonOpenHandler);
+            if (map) map.events.remove('balloonopen', balloonOpenHandler);
         };
     }, [announcements, selectedId, onPlacemarkClick, navigate, ymapsApi]);
 
-    if (!ymapsApi) { return <div>Загрузка API Яндекс.Карт...</div>; }
+    if (!ymapsApi) {
+        return <div>Загрузка API Яндекс.Карт...</div>;
+    }
+
     return <div ref={mapContainerRef} style={{ width: '100%', height: '100%' }}></div>;
 };
 

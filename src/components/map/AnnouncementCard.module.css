@@ -5,7 +5,7 @@
 .petImage { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; }
 .statusTag { position: absolute; bottom: 8px; left: 8px; padding: 4px 8px; border-radius: 6px; font-size: 12px; font-weight: 700; }
 .urgentTag { background-color: var(--red); color: white; }
-.archivedTag { background-color: var(--cool-gray); color: var(--deep-blue); }
+.archivedTag { background-color: var(--cool-gray); color: var(--light-gray); }
 .defaultTag { background-color: var(--amber-yellow); color: white; }
 .content { flex-grow: 1; display: flex; flex-direction: column; min-width: 0; }
 .title { font-size: 18px; font-weight: 700; color: var(--light-gray); margin: 0 0 8px 0; }

@@ -93,7 +93,7 @@
 
 .buttonGroup button {
     background-color: transparent;
-    color: var(--deep-blue);
+    color: var(--light-gray);
     border: none;
     border-radius: 8px;
     padding: 12px;
@@ -106,7 +106,6 @@
 
 .buttonGroup button.active {
     background-color: var(--deep-blue);
-    color: var(--light-gray);
     box-shadow: 0 2px 5px rgba(0,0,0,0.2);
 }
 
