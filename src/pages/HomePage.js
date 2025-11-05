@@ -53,11 +53,9 @@ return (
 <OurFriends />
 </div>
 <section className={styles.lightGraySection}>
-<div className={styles.container}>
-<div className={styles.storiesSectionWrapper}>
 <img src={illustration} alt="" className={styles.sectionIllustration} />
+<div className={styles.container}>
 <SuccessStories />
-</div>
 </div>
 </section>
 </main>

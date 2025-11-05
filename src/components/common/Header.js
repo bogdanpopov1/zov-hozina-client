@@ -303,7 +303,6 @@ const Header = () => {
                             <Link to="/" className={styles.logo} onClick={closeMobileMenu}>
                                 <img src={logo} alt="Зов Хозяина" />
                             </Link>
-                            <button className={styles.mobileMenuToggle} onClick={closeMobileMenu}><X /></button>
                         </div>
                         <div ref={searchRef}>
                             <SearchBar

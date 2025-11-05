@@ -34,7 +34,7 @@ const Footer = () => {
                         </div>
                         <div className={styles.ctaColumn}>
                             <Link to="/map" className={styles.mapButton}>Карта поисков</Link>
-                            <a href="https://t.me/your_bot_name" target="_blank" rel="noopener noreferrer" className={styles.telegramLink}>
+                            <a href="https://t.me/ZovHozinaBot" target="_blank" rel="noopener noreferrer" className={styles.telegramLink}>
                                 <span>Подпишитесь на наш</span>
                                 <span className={styles.telegramBotLine}> телеграм-бот <FaTelegramPlane /> </span>
                             </a>
@@ -66,7 +66,7 @@ const Footer = () => {
                     </details>
                     <div className={styles.mobileActions}>
                         <Link to="/map" className={styles.mapButton}>Карта поисков</Link>
-                        <a href="https://t.me/your_bot_name" target="_blank" rel="noopener noreferrer" className={styles.telegramLink}>
+                        <a href="https://t.me/ZovHozinaBot" target="_blank" rel="noopener noreferrer" className={styles.telegramLink}>
                             <span>Подпишитесь на наш</span>
                             <span className={styles.telegramBotLine}> телеграм-бот <FaTelegramPlane /> </span>
                         </a>

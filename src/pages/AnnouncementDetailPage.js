@@ -8,6 +8,7 @@ import { MapPin, Clock, User, Palette } from 'lucide-react';
 import SearchLog from '../components/announcements/SearchLog';
 import AuthModal from '../components/common/AuthModal';
 import ContactOwnerModal from '../components/announcements/ContactOwnerModal';
+import defaultIcon from '../assets/icons/default.svg';
 
 const AnnouncementDetailPage = () => {
     const { id } = useParams();
@@ -30,6 +31,7 @@ const AnnouncementDetailPage = () => {
                 setAnnouncement(response.data);
             } catch (err) {
                 setError('Не удалось загрузить объявление. Возможно, оно было удалено.');
+                console.error(err);
             } finally {
                 setLoading(false);
             }
@@ -43,6 +45,7 @@ const AnnouncementDetailPage = () => {
             const response = await api.patch(`/api/announcements/${id}/status`, { status: newStatus });
             setAnnouncement(response.data);
         } catch (err) {
+            console.error("Failed to update status", err);
             alert("Ошибка при изменении статуса.");
         } finally {
             setIsSubmitting(false);
@@ -56,6 +59,7 @@ const AnnouncementDetailPage = () => {
                 await api.delete(`/api/announcements/${id}`);
                 navigate('/my-ads');
             } catch (err) {
+                console.error("Failed to delete announcement", err);
                 alert("Ошибка при удалении объявления.");
             } finally {
                 setIsSubmitting(false);
@@ -89,10 +93,9 @@ const AnnouncementDetailPage = () => {
     }
 
     const isOwner = user && user.user_id === announcement.user_id;
-    const primaryPhoto = announcement.photos?.[activePhoto] || announcement.photos?.[0];
+    const primaryPhoto = announcement.photos && announcement.photos.length > 0 ? announcement.photos[activePhoto] || announcement.photos[0] : null;
     const capitalize = (s) => s && s.charAt(0).toUpperCase() + s.slice(1);
     const formatDate = (dateString) => new Date(dateString).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
-
     const getTagInfo = () => {
         if (announcement.status === 'archived') {
             return { text: 'Питомец найден', className: styles.foundTag };
@@ -112,7 +115,11 @@ const AnnouncementDetailPage = () => {
                     <div className={styles.mainInfo}>
                         <div className={styles.gallery}>
                             <div className={styles.mainPhoto}>
-                                {primaryPhoto ? <img src={primaryPhoto.url} alt="Фото питомца" /> : <div className={styles.placeholderImage}></div>}
+                                <img
+                                    src={primaryPhoto ? primaryPhoto.url : defaultIcon}
+                                    alt="Фото питомца"
+                                    className={!primaryPhoto ? styles.defaultPetImage : ''}
+                                />
                             </div>
                             {announcement.photos && announcement.photos.length > 1 && (
                                 <div className={styles.thumbnailGrid}>
@@ -153,7 +160,7 @@ const AnnouncementDetailPage = () => {
                     </div>
                 </div>
                 <div className={styles.logWrapper}>
-                    <SearchLog announcementId={announcement.announcement_id} />
+                    <SearchLog announcementId={announcement.announcement_id} isOwner={isOwner} />
                 </div>
             </div>
             {isAuthModalOpen && <AuthModal onClose={() => setAuthModalOpen(false)} />}

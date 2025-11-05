@@ -68,7 +68,7 @@
     border-radius: 8px;
     background-color: var(--amber-yellow);
     color: var(--light-gray);
-    font-weight: 700;
+    font-weight: 600;
     font-size: 16px;
     transition: filter 0.2s;
 }
