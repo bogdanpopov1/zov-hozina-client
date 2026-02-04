@@ -104,12 +104,39 @@
     flex-direction: column;
 }
 
+.headerRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
 .tag {
     padding: 6px 12px;
     border-radius: 6px;
     font-weight: 600;
-    align-self: flex-start;
-    margin-bottom: 16px;
+}
+
+.mapButton {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: transparent;
+    border: 1px solid var(--cool-gray);
+    color: var(--light-gray);
+    padding: 8px 14px;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.mapButton:hover {
+    border-color: var(--amber-yellow);
+    color: var(--amber-yellow);
 }
 
 .lostTag {
@@ -130,12 +157,14 @@
 .details h1 {
     font-size: 32px;
     margin-bottom: 24px;
+    line-height: 1.3;
 }
 
 .description {
     color: var(--cool-gray);
     line-height: 1.7;
     margin-bottom: 32px;
+    white-space: pre-wrap;
 }
 
 .metaGrid {

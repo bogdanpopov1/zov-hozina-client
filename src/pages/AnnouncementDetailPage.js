@@ -2,9 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import api from '../api/axiosConfig';
 import { useAuth } from '../context/AuthContext';
-import { useAnnouncement } from '../context/AnnouncementContext';
 import styles from './AnnouncementDetailPage.module.css';
-import { MapPin, Clock, User, Palette } from 'lucide-react';
+import { MapPin, Clock, User, Palette, Map } from 'lucide-react';
 import SearchLog from '../components/announcements/SearchLog';
 import AuthModal from '../components/common/AuthModal';
 import ContactOwnerModal from '../components/announcements/ContactOwnerModal';
@@ -14,7 +13,6 @@ const AnnouncementDetailPage = () => {
     const { id } = useParams();
     const navigate = useNavigate();
     const { user } = useAuth();
-    const { setAnnouncementToEdit } = useAnnouncement();
     const [announcement, setAnnouncement] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -68,8 +66,7 @@ const AnnouncementDetailPage = () => {
     };
 
     const handleEdit = () => {
-        setAnnouncementToEdit(announcement);
-        navigate('/create-announcement');
+        navigate(`/edit-announcement/${id}`);
     };
 
     const handleContactClick = () => {
@@ -78,6 +75,54 @@ const AnnouncementDetailPage = () => {
         } else {
             setAuthModalOpen(true);
         }
+    };
+
+    const handleShowOnMap = () => {
+        if (announcement) {
+            navigate('/map', {
+                state: {
+                    selectedAnnouncementId: announcement.announcement_id
+                }
+            });
+        }
+    };
+
+    // Логика формирования заголовка (как в карточке)
+    const formatTitle = (ad) => {
+        if (!ad) return '';
+
+        const type = (ad.pet_type || '').toLowerCase();
+        const isFound = ad.announcement_type === 'found';
+        const gender = ad.gender;
+
+        let action = '';
+        let animal = ad.pet_type;
+
+        if (type === 'собака') {
+            if (gender === 'male') {
+                animal = 'пёс';
+                action = isFound ? 'Найден' : 'Пропал';
+            } else {
+                animal = 'собака';
+                action = isFound ? 'Найдена' : 'Пропала';
+            }
+        } else if (type === 'кошка') {
+            if (gender === 'male') {
+                animal = 'кот';
+                action = isFound ? 'Найден' : 'Пропал';
+            } else {
+                animal = 'кошка';
+                action = isFound ? 'Найдена' : 'Пропала';
+            }
+        } else {
+            animal = ad.pet_type;
+            action = isFound ? 'Найден(а)' : 'Пропал(а)';
+        }
+
+        const namePart = ad.pet_name ? ` ${ad.pet_name}` : '';
+        const breedPart = ad.pet_breed ? `, ${ad.pet_breed.toLowerCase()}` : '';
+
+        return `${action} ${animal}${namePart}${breedPart}`;
     };
 
     if (loading) {
@@ -94,8 +139,8 @@ const AnnouncementDetailPage = () => {
 
     const isOwner = user && user.user_id === announcement.user_id;
     const primaryPhoto = announcement.photos && announcement.photos.length > 0 ? announcement.photos[activePhoto] || announcement.photos[0] : null;
-    const capitalize = (s) => s && s.charAt(0).toUpperCase() + s.slice(1);
     const formatDate = (dateString) => new Date(dateString).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
+
     const getTagInfo = () => {
         if (announcement.status === 'archived') {
             return { text: 'Питомец найден', className: styles.foundTag };
@@ -107,6 +152,7 @@ const AnnouncementDetailPage = () => {
     };
 
     const tagInfo = getTagInfo();
+    const title = formatTitle(announcement);
 
     return (
         <>
@@ -132,8 +178,15 @@ const AnnouncementDetailPage = () => {
                             )}
                         </div>
                         <div className={styles.details}>
-                            <span className={`${styles.tag} ${tagInfo.className}`}>{tagInfo.text}</span>
-                            <h1>{capitalize(announcement.pet_type)}, кличка "{announcement.pet_name}"</h1>
+                            <div className={styles.headerRow}>
+                                <span className={`${styles.tag} ${tagInfo.className}`}>{tagInfo.text}</span>
+                                <button onClick={handleShowOnMap} className={styles.mapButton}>
+                                    <Map size={16} /> На карте
+                                </button>
+                            </div>
+
+                            <h1>{title}</h1>
+
                             <p className={styles.description}>{announcement.description || 'Подробное описание отсутствует.'}</p>
                             <div className={styles.metaGrid}>
                                 <div className={styles.metaItem}><MapPin size={20} /><span>{announcement.location_address}</span></div>

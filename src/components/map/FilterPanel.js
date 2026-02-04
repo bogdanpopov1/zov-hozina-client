@@ -1,18 +1,26 @@
 import React, { useState, useEffect } from 'react';
 import styles from './FilterPanel.module.css';
 import useDebounce from '../../hooks/useDebounce';
-
-const hardcodedCategories = [
-    { name: 'Собаки', slug: 'dogs' },
-    { name: 'Кошки', slug: 'cats' },
-    { name: 'Птицы', slug: 'birds' },
-];
+import api from '../../api/axiosConfig';
 
 const FilterPanel = ({ initialFilters, onApply, onReset }) => {
     const [filters, setFilters] = useState(initialFilters);
+    const [categories, setCategories] = useState([]);
     const [addressSuggestions, setAddressSuggestions] = useState([]);
     const [isSuggestionsVisible, setSuggestionsVisible] = useState(false);
     const debouncedLocationInput = useDebounce(filters.location, 400);
+
+    useEffect(() => {
+        const fetchCategories = async () => {
+            try {
+                const response = await api.get('/api/categories');
+                setCategories(response.data);
+            } catch (error) {
+                console.error("Failed to fetch categories for filter", error);
+            }
+        };
+        fetchCategories();
+    }, []);
 
     useEffect(() => {
         if (debouncedLocationInput.length > 2) {
@@ -82,9 +90,20 @@ const FilterPanel = ({ initialFilters, onApply, onReset }) => {
             <div className={styles.formGroup}>
                 <label>Вид животного</label>
                 <div className={styles.buttonGroup}>
-                    <button onClick={() => handleButtonGroupChange('pet_type_slug', '')} className={filters.pet_type_slug === '' ? styles.active : ''}>Все</button>
-                    {hardcodedCategories.map(cat => (
-                        <button key={cat.slug} onClick={() => handleButtonGroupChange('pet_type_slug', cat.slug)} className={filters.pet_type_slug === cat.slug ? styles.active : ''}>{cat.name}</button>
+                    <button
+                        onClick={() => handleButtonGroupChange('pet_type_slug', '')}
+                        className={filters.pet_type_slug === '' ? styles.active : ''}
+                    >
+                        Все
+                    </button>
+                    {categories.map(cat => (
+                        <button
+                            key={cat.category_id}
+                            onClick={() => handleButtonGroupChange('pet_type_slug', cat.slug)}
+                            className={filters.pet_type_slug === cat.slug ? styles.active : ''}
+                        >
+                            {cat.name}
+                        </button>
                     ))}
                 </div>
             </div>

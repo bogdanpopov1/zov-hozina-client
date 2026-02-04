@@ -9,12 +9,16 @@ const AnnouncementCard = ({ announcement, onClick, isSelected }) => {
             return { text: 'В архиве', className: styles.archivedTag };
         }
 
+        if (announcement.announcement_type === 'found') {
+            return { text: 'Питомец замечен', className: styles.foundTag };
+        }
+
         const creationDate = new Date(announcement.created_at);
         const now = new Date();
         const fiveDaysInMs = 5 * 24 * 60 * 60 * 1000;
         const isRecent = (now - creationDate) <= fiveDaysInMs;
 
-        if (isRecent || announcement.is_featured) {
+        if (isRecent) {
             return { text: 'Срочный поиск', className: styles.urgentTag };
         }
 
@@ -30,7 +34,55 @@ const AnnouncementCard = ({ announcement, onClick, isSelected }) => {
         return `${Math.floor(diffInHours / 24)} дней назад`;
     };
 
+    // НОВАЯ ЛОГИКА ФОРМИРОВАНИЯ ЗАГОЛОВКА
+    const formatTitle = (ad) => {
+        const type = (ad.pet_type || '').toLowerCase();
+        const isFound = ad.announcement_type === 'found';
+        const gender = ad.gender; // 'male', 'female', 'unknown'
+
+        let action = '';
+        let animal = ad.pet_type; // Значение по умолчанию
+
+        // Логика для Собак
+        if (type === 'собака') {
+            if (gender === 'male') {
+                animal = 'пёс';
+                action = isFound ? 'Найден' : 'Пропал';
+            } else {
+                // female или unknown
+                animal = 'собака';
+                action = isFound ? 'Найдена' : 'Пропала';
+            }
+        }
+        // Логика для Кошек
+        else if (type === 'кошка') {
+            if (gender === 'male') {
+                animal = 'кот';
+                action = isFound ? 'Найден' : 'Пропал';
+            } else {
+                // female или unknown
+                animal = 'кошка';
+                action = isFound ? 'Найдена' : 'Пропала';
+            }
+        }
+        // Логика для остальных (Птица, Другое и т.д.)
+        else {
+            animal = ad.pet_type; // Оставляем как есть (например, "Птица")
+            action = isFound ? 'Найден(а)' : 'Пропал(а)';
+        }
+
+        // Сборка строки
+        // Если есть имя -> добавляем его
+        const namePart = ad.pet_name ? ` ${ad.pet_name}` : '';
+
+        // Если есть порода -> добавляем через запятую
+        const breedPart = ad.pet_breed ? `, ${ad.pet_breed.toLowerCase()}` : '';
+
+        return `${action} ${animal}${namePart}${breedPart}`;
+    };
+
     const statusTag = getStatusTag(announcement);
+    const title = formatTitle(announcement);
     const imageUrl = announcement.photos?.[0]?.url || defaultIcon;
     const cardClasses = `${styles.card} ${isSelected ? styles.selectedCard : ''}`;
 
@@ -49,7 +101,7 @@ const AnnouncementCard = ({ announcement, onClick, isSelected }) => {
                 )}
             </div>
             <div className={styles.content}>
-                <h4 className={styles.title}>Пропал(а) {announcement.pet_breed}, кличка "{announcement.pet_name}"</h4>
+                <h4 className={styles.title}>{title}</h4>
                 <p className={styles.description}>{announcement.description}</p>
                 <div className={styles.metaGrid}>
                     <div className={styles.metaItem}><MapPin className={styles.icon} /> <span>{announcement.location_address}</span></div>

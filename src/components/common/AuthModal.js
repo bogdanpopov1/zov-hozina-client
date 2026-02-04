@@ -52,10 +52,10 @@ const AuthModal = ({ onClose }) => {
                     <button type="submit" className={styles.submitButton}>
                         {isRegister ? 'Зарегистрироваться' : 'Войти'}
                     </button>
-                    <div className={styles.separator}>или</div>
+                    {/* <div className={styles.separator}>или</div>
                     <button type="button" className={styles.telegramButton}>
                         Войти через Telegram
-                    </button>
+                    </button> */}
                 </form>
                 <div className={styles.toggleForm}>
                     {isRegister ? 'Уже есть аккаунт?' : 'Еще нет аккаунта?'}

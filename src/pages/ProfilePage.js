@@ -18,6 +18,7 @@ const ProfilePage = () => {
     const [formErrors, setFormErrors] = useState({});
     const [isVolunteer, setIsVolunteer] = useState(false);
     const [citySuggestions, setCitySuggestions] = useState([]);
+    const [isCityFocused, setIsCityFocused] = useState(false);
     const debouncedLocation = useDebounce(formData.location, 400);
 
     useEffect(() => {
@@ -70,6 +71,7 @@ const ProfilePage = () => {
     const handleCitySelect = (suggestion) => {
         setFormData(prev => ({ ...prev, location: suggestion.value }));
         setCitySuggestions([]);
+        setIsCityFocused(false);
     };
 
     const handleVolunteerToggle = async (e) => {
@@ -145,8 +147,16 @@ const ProfilePage = () => {
                                 </div>
                                 <div className={`${styles.formGroup} ${styles.locationGroup}`}>
                                     <label>Город</label>
-                                    <input type="text" name="location" value={formData.location} onChange={handleChange} />
-                                    {citySuggestions.length > 0 && (
+                                    <input
+                                        type="text"
+                                        name="location"
+                                        value={formData.location}
+                                        onChange={handleChange}
+                                        onFocus={() => setIsCityFocused(true)}
+                                        onBlur={() => setTimeout(() => setIsCityFocused(false), 200)}
+                                        autoComplete="off"
+                                    />
+                                    {isCityFocused && citySuggestions.length > 0 && (
                                         <ul className={styles.suggestionsList}>
                                             {citySuggestions.map((s, i) => (
                                                 <li key={i} onMouseDown={() => handleCitySelect(s)}>
