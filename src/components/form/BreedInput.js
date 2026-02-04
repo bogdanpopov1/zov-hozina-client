@@ -1,18 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import api from '../../api/axiosConfig';
-import useDebounce from '../../hooks/useDebounce'; // Предполагаем, что хук лежит здесь
+import useDebounce from '../../hooks/useDebounce';
 import styles from './BreedInput.module.css';
 
 const BreedInput = ({ value, onChange, categoryId }) => {
     const [inputValue, setInputValue] = useState(value);
     const [suggestions, setSuggestions] = useState([]);
+    const [isSuggestionsVisible, setSuggestionsVisible] = useState(false);
     const debouncedSearchTerm = useDebounce(inputValue, 300);
 
     useEffect(() => {
-        setInputValue(value); // Синхронизация с состоянием родителя
+        setInputValue(value);
     }, [value]);
 
     useEffect(() => {
+        if (!isSuggestionsVisible) {
+            return;
+        }
+
         if (debouncedSearchTerm.length < 2 || !categoryId) {
             setSuggestions([]);
             return;
@@ -31,17 +36,19 @@ const BreedInput = ({ value, onChange, categoryId }) => {
         };
 
         fetchSuggestions();
-    }, [debouncedSearchTerm, categoryId]);
+    }, [debouncedSearchTerm, categoryId, isSuggestionsVisible]);
 
     const handleInputChange = (e) => {
         setInputValue(e.target.value);
         onChange(e.target.value);
+        setSuggestionsVisible(true);
     };
 
     const handleSuggestionClick = (breedName) => {
         setInputValue(breedName);
         onChange(breedName);
         setSuggestions([]);
+        setSuggestionsVisible(false);
     };
 
     return (
@@ -52,13 +59,17 @@ const BreedInput = ({ value, onChange, categoryId }) => {
                 name="pet_breed"
                 value={inputValue}
                 onChange={handleInputChange}
+                onFocus={() => {
+                    if (inputValue.length >= 2) setSuggestionsVisible(true);
+                }}
+                onBlur={() => setTimeout(() => setSuggestionsVisible(false), 200)}
                 placeholder="Начните вводить породу..."
                 autoComplete="off"
             />
-            {suggestions.length > 0 && (
+            {isSuggestionsVisible && suggestions.length > 0 && (
                 <ul className={styles.suggestionsList}>
                     {suggestions.map(breed => (
-                        <li key={breed.breed_id} onClick={() => handleSuggestionClick(breed.name)}>
+                        <li key={breed.breed_id} onMouseDown={() => handleSuggestionClick(breed.name)}>
                             {breed.name}
                         </li>
                     ))}

@@ -12,43 +12,63 @@ import useDebounce from '../../hooks/useDebounce';
 const ownerLinks = [
     { path: '/create-announcement', label: 'Создать объявление' },
     { path: '/my-ads', label: 'Мои объявления' },
-    { path: '/faq', label: 'Вопросы и ответы' },
-    { path: '/tips', label: 'Полезные советы' },
-    { path: '/stories', label: 'Счастливые истории' },
+    // { path: '/faq', label: 'Вопросы и ответы' },
+    // { path: '/tips', label: 'Полезные советы' },
+    // { path: '/stories', label: 'Счастливые истории' },
 ];
 
 const volunteerLinks = [
     { path: '/about-volunteers', label: 'Кто такие волонтеры' },
-    { path: '/memo', label: 'Памятка волонтера' },
-    { path: '/templates', label: 'Шаблоны объявлений' },
-    { path: '/rating', label: 'Рейтинг волонтеров' },
+    // { path: '/memo', label: 'Памятка волонтера' },
+    // { path: '/templates', label: 'Шаблоны объявлений' },
+    // { path: '/rating', label: 'Рейтинг волонтеров' },
 ];
 
-const NotificationBell = React.memo(({ notifications, isNotificationOpen, onToggle, onItemClick, isMobile }) => (
-    <div className={styles.notificationContainer}>
-        <button onClick={onToggle} className={`${styles.notificationButton} ${isMobile ? styles.mobileNotificationButton : ''}`}>
-            <Bell />
-            {notifications.length > 0 && <span className={styles.notificationIndicator}></span>}
-        </button>
-        {isNotificationOpen && (
-            <div className={styles.notificationDropdown}>
-                {notifications.length > 0 ? (
-                    notifications.map(n => (
-                        <div
-                            key={n.log_id}
-                            className={styles.notificationItem}
-                            onMouseDown={() => onItemClick(n.log_id, n.announcement_id)}
-                        >
-                            <span className={styles.userName}>{n.user.name}</span> оставил запись в журнале по объявлению <span className={styles.petName}>"{n.announcement.pet_name}"</span>
-                        </div>
-                    ))
-                ) : (
-                    <div className={styles.noNotifications}>Новых уведомлений нет</div>
-                )}
-            </div>
-        )}
-    </div>
-));
+const NotificationBell = React.memo(({ notifications, isNotificationOpen, onToggle, onItemClick, isMobile }) => {
+
+    const renderNotificationContent = (n) => {
+        if (n.type === 'log') {
+            return (
+                <>
+                    <span className={styles.userName}>{n.data.user_name}</span> оставил запись в журнале по объявлению <span className={styles.petName}>"{n.data.pet_name}"</span>
+                </>
+            );
+        } else if (n.type === 'zone_alert') {
+            return (
+                <>
+                    <span className={styles.alertIcon}>📍</span> В вашей зоне: <span className={styles.petName}>{n.data.pet_type} {n.data.pet_name || ''}</span> ({n.data.location_address})
+                </>
+            );
+        }
+        return <span>Новое уведомление</span>;
+    };
+
+    return (
+        <div className={styles.notificationContainer}>
+            <button onClick={onToggle} className={`${styles.notificationButton} ${isMobile ? styles.mobileNotificationButton : ''}`}>
+                <Bell />
+                {notifications.length > 0 && <span className={styles.notificationIndicator}></span>}
+            </button>
+            {isNotificationOpen && (
+                <div className={styles.notificationDropdown}>
+                    {notifications.length > 0 ? (
+                        notifications.map(n => (
+                            <div
+                                key={n.id}
+                                className={`${styles.notificationItem} ${n.type === 'zone_alert' ? styles.zoneAlertItem : ''}`}
+                                onMouseDown={() => onItemClick(n.real_id, n.data.announcement_id)}
+                            >
+                                {renderNotificationContent(n)}
+                            </div>
+                        ))
+                    ) : (
+                        <div className={styles.noNotifications}>Новых уведомлений нет</div>
+                    )}
+                </div>
+            )}
+        </div>
+    );
+});
 
 const SearchBar = React.memo(({ searchValue, onSearchChange, onKeyDown, onClear, suggestions, isVisible, onSuggestionClick, isMobile }) => (
     <div className={isMobile ? styles.mobileSearch : styles.searchBar}>
@@ -107,7 +127,7 @@ const Header = () => {
     }, [location.search]);
 
     useEffect(() => {
-        if (debouncedSearchValue.length > 2) {
+        if (debouncedSearchValue.length > 0) {
             const fetchSuggestions = async () => {
                 try {
                     const response = await api.get(`/api/announcements/search-suggestion?search=${debouncedSearchValue}`);
@@ -135,6 +155,8 @@ const Header = () => {
                 }
             };
             fetchNotifications();
+            const interval = setInterval(fetchNotifications, 60000);
+            return () => clearInterval(interval);
         }
     }, [user]);
 
@@ -166,13 +188,13 @@ const Header = () => {
         setSuggestionsVisible(false);
     };
 
-    const handleNotificationItemClick = async (logId, announcementId) => {
+    const handleNotificationItemClick = async (realId, announcementId) => {
         navigate(`/announcements/${announcementId}`);
         setNotificationOpen(false);
 
         try {
-            await api.post(`/api/notifications/${logId}/read`);
-            setNotifications(prev => prev.filter(n => n.log_id !== logId));
+            await api.post(`/api/notifications/${realId}/read`);
+            setNotifications(prev => prev.filter(n => n.real_id !== realId));
         } catch (error) {
             console.error("Failed to mark notification as read", error);
         }

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { useLocation } from 'react-router-dom';
 import AnnouncementCard from '../components/map/AnnouncementCard';
 import YandexMap from '../components/map/YandexMap';
 import FilterPanel from '../components/map/FilterPanel';
@@ -26,6 +27,7 @@ const PANEL_STATES = {
 };
 
 const MapPage = () => {
+    const location = useLocation();
     const [announcements, setAnnouncements] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -79,6 +81,25 @@ const MapPage = () => {
     useEffect(() => {
         fetchAnnouncements(filters, sortBy, debouncedSearchTerm);
     }, [fetchAnnouncements, filters, sortBy, debouncedSearchTerm]);
+
+    // Обработка перехода с кнопки "На карте"
+    useEffect(() => {
+        if (location.state?.selectedAnnouncementId && announcements.length > 0) {
+            const id = location.state.selectedAnnouncementId;
+            const targetAd = announcements.find(a => a.announcement_id === id);
+
+            if (targetAd) {
+                handleSelection(targetAd);
+                // Очищаем state, чтобы при обновлении страницы не прыгало обратно
+                window.history.replaceState({}, document.title);
+            } else {
+                // Если объявления нет в текущем списке (например, из-за пагинации),
+                // можно было бы подгрузить его отдельно, но пока просто установим ID,
+                // чтобы если оно появится на карте, оно открылось.
+                setSelectedId(id);
+            }
+        }
+    }, [location.state, announcements]);
 
     useEffect(() => {
         if (!selectedId || !listRef.current) return;

@@ -94,9 +94,45 @@ const YandexMap = ({ announcements, mapState, selectedId, onPlacemarkClick, onBa
                 placemark.events.add('click', () => onPlacemarkClick(ad));
 
                 if (isSelected) {
-                    const prefix = ad.gender === 'female' ? 'Пропала' : 'Пропал';
+                    const formatTitle = (item) => {
+                        const type = (item.pet_type || '').toLowerCase();
+                        const isFound = item.announcement_type === 'found';
+                        const gender = item.gender;
+
+                        let action = '';
+                        let animal = item.pet_type;
+
+                        if (type === 'собака') {
+                            if (gender === 'male') {
+                                animal = 'пёс';
+                                action = isFound ? 'Найден' : 'Пропал';
+                            } else {
+                                animal = 'собака';
+                                action = isFound ? 'Найдена' : 'Пропала';
+                            }
+                        } else if (type === 'кошка') {
+                            if (gender === 'male') {
+                                animal = 'кот';
+                                action = isFound ? 'Найден' : 'Пропал';
+                            } else {
+                                animal = 'кошка';
+                                action = isFound ? 'Найдена' : 'Пропала';
+                            }
+                        } else {
+                            animal = item.pet_type;
+                            action = isFound ? 'Найден(а)' : 'Пропал(а)';
+                        }
+
+                        const namePart = item.pet_name ? ` ${item.pet_name}` : '';
+                        const breedPart = item.pet_breed ? `, ${item.pet_breed.toLowerCase()}` : '';
+
+                        return `${action} ${animal}${namePart}${breedPart}`;
+                    };
+
+                    const title = formatTitle(ad);
+
                     map.balloon.open(placemark.geometry.getCoordinates(), {
-                        contentHeader: `${prefix} ${ad.pet_breed}, "${ad.pet_name}"`,
+                        contentHeader: title,
                         contentBody: `<p>${ad.description || ''}</p><a href="/announcements/${selectedId}" id="balloon-link-${selectedId}">Подробнее...</a>`,
                         contentFooter: `Информация обновлена ${new Date(ad.updated_at).toLocaleDateString()}`
                     });

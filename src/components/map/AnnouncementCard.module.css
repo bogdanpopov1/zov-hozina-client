@@ -50,6 +50,10 @@ color: white;
 background-color: var(--cool-gray);
 color: var(--light-gray);
 }
+.foundTag {
+background-color: var(--green);
+color: var(--light-gray);
+}
 .defaultTag {
 background-color: var(--amber-yellow);
 color: white;
